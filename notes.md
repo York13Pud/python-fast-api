@@ -50,3 +50,18 @@ def get_posts(text):
     return {"text_value": text}
 ```
 
+The post request will have a requirement to pass some text as the {text} parameter and the above will return it as a JSON response.
+
+A more practical example:
+
+``` python
+@app.post("/createpost")
+def get_posts(payload: dict = Body(...)):
+    return {
+                "post_title": payload["title"],
+                "post_heading": payload["heading"]
+            }
+```
+A post request that uses JSON from the Body of the request to be set as a dictionary and then returned back with different key names.
+
+## Post Request Data Validation

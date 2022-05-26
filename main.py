@@ -1,6 +1,6 @@
 # --- Import the required modules:
 from fastapi import FastAPI
-
+from fastapi.params import Body
 # --- Create an instance of FastAPI
 app = FastAPI()
 
@@ -24,3 +24,13 @@ def get_posts():
 @app.post("/test/{text}")
 def get_posts(text):
     return {"text_value": text}
+
+
+# --- A post request that uses JSON from the Body of the request
+# --- to be set as a dictionary and then returned back with different key names.
+@app.post("/createpost")
+def get_posts(payload: dict = Body(...)):
+    return {
+                "post_title": payload["title"],
+                "post_heading": payload["heading"]
+            }
