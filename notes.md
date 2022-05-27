@@ -97,3 +97,32 @@ def get_posts(new_post: Post):
                 "post_rating": new_post.rating
             }
 ```
+
+## CRUD Operations
+
+Create = Post
+
+``` python
+@app.post("/posts")
+```
+
+Read = Get
+
+``` python
+@app.post("/posts")
+# OR (specify a specific post_id)
+@app.post("/posts/{post_id}")
+```
+
+Update = Put (update entire record) / Patch (update part of a record)
+
+``` python
+@app.put("/posts/{post_id}")
+```
+
+Delete = Well, erm, delete a record!! :-)
+
+``` python
+@app.delete("/posts/{post_id}")
+```
+

@@ -27,6 +27,18 @@ async def root():
     return {"greeting": "Hello World!"}
 
 
+# --- Get all posts:
+@app.get("/posts")
+def get_posts():
+    return {"data": "payload"}
+
+
+# --- Get one post record based on its post_id:
+@app.get("/posts/{post_id}")
+def get_posts(post_id):
+    return {"text_value": post_id}
+
+
 # --- A post request that uses JSON from the Body of the request
 @app.post("/posts")
 def get_posts(new_post: Post):
@@ -42,3 +54,12 @@ def get_posts(new_post: Post):
                 "post_published": new_post.published,
                 "post_rating": new_post.rating
             }
+
+
+# --- A simple post request:
+@app.post("/test/{text}")
+def get_posts(text):
+    return {"text_value": text}
+
+
+
