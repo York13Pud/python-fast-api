@@ -1,6 +1,6 @@
 # --- Import the required modules:
 from typing import Optional
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.params import Body
 from pydantic import BaseModel
 
@@ -9,12 +9,18 @@ app = FastAPI()
 
 # Define a schema model for the post using pydantic, which will also do validation:
 class Post(BaseModel):
+    id: int
     title: str
     content: str
     # published is an optional field as a default is assigned to it.
     published: bool = True
     # This will have a default value of none / null.
     rating: Optional[int] = None
+
+
+# --- Create a variable with an empty list to store the posts (temp solution until DB ready.)
+my_posts = [{"id": 1, "title": "blog post 1", "content": "content of blog post 1"},
+            {"id": 2, "title": "blog post 2", "content": "content of blog post 2"}]
 
 # --- Create a base route, also called a path operation:
 # Note app.get = a GET method. "/" is the URL path.
@@ -29,37 +35,54 @@ async def root():
 
 # --- Get all posts:
 @app.get("/posts")
-def get_posts():
-    return {"data": "payload"}
+def get_all_posts():
+    return {"all_posts": my_posts}
 
 
-# --- Get one post record based on its post_id:
+# --- Get one post record based on its post_id (path parameter):
 @app.get("/posts/{post_id}")
-def get_posts(post_id):
-    return {"text_value": post_id}
+def get_one_post(post_id: int, response: Response):
+    print(type(post_id))
+    for post in my_posts:
+        if post["id"] == post_id:
+            return {"post_data": post}
+    
+    error = response.status_code = 404        
+    return {"error": f"Post ID {post_id} not found",
+            "status": error }
 
 
-# --- A post request that uses JSON from the Body of the request
+# --- A post request that uses JSON from the Body of the request:
 @app.post("/posts")
-def get_posts(new_post: Post):
+def new_post(new_post: Post):
     # --- Show the contents of the new_post pydantic model:
     print(new_post)
     
     # --- Optional: You can convert the pydantic model to a dictionary:
     print(new_post.dict())
     
-    return {
-                "post_title": new_post.title,
-                "post_content": new_post.content,
-                "post_published": new_post.published,
-                "post_rating": new_post.rating
-            }
+    # --- Add the post to the my_posts list:
+    my_posts.append(new_post.dict())
+    
+    # --- Return the value of the post:
+    return {"data": new_post.dict()}
+
+
+@app.delete("/delete/{post_id}")
+def delete_post(post_id: int):
+    for post in my_posts:
+        if post["id"] == post_id:
+            my_posts.remove(post)
+            return {"post_id": post["id"], "status": "deleted"}
+    return {"error": "Post not found"}
 
 
 # --- A simple post request:
 @app.post("/test/{text}")
 def get_posts(text):
     return {"text_value": text}
+
+
 
 
 

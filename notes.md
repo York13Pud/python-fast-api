@@ -1,6 +1,6 @@
 # FastAPI Notes
 
-## Basics
+## Basics.
 
 A simple app example with a single get path operation:
 
@@ -42,7 +42,7 @@ In addition, you can view the API docs at the below URL (it uses SwaggerUI to re
 
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs "http://127.0.0.1:8000/docs")
 
-## Post Request / Path Operation Example
+## Post Request / Path Operation Example.
 
 ``` python
 # --- A simple post request:
@@ -65,7 +65,7 @@ def get_posts(payload: dict = Body(...)):
 ```
 A post request that uses JSON from the Body of the request to be set as a dictionary and then returned back with different key names.
 
-## Post Request Data Validation
+## Post Request Data Validation.
 
 Use the pydantc module to allow you to create a schema using a class. When called, it will also do data validation. For example:
 
@@ -98,7 +98,7 @@ def get_posts(new_post: Post):
             }
 ```
 
-## CRUD Operations
+## CRUD Operations.
 
 Create = Post
 
@@ -126,3 +126,47 @@ Delete = Well, erm, delete a record!! :-)
 @app.delete("/posts/{post_id}")
 ```
 
+## Path Operation Order.
+
+Put simply, the order of the paths in you files matters. If you have them set in any old order, you can encounter issues. For example:
+
+* GET HTTP 127.0.0.1/posts
+* GET HTTP 127.0.0.1/posts/{post_id}
+* GET HTTP 127.0.0.1/posts/all_posts
+
+With the above list of three GET request paths, if you try to call all_posts, it will fail as it actually his /posts/{post_id} as it is above it and the path parameter {post_id} could take the form of all_posts. To remediate this, change the order for the paths in the file so that all_posts is above {post_id}:
+
+* GET HTTP 127.0.0.1/posts
+* GET HTTP 127.0.0.1/posts/all_posts
+* GET HTTP 127.0.0.1/posts/{post_id}
+
+## Error Codes.
+
+You can specify an HTTP error code for when something occurs. In the below example, we will return a 404 (not found) if the post_id is not matched:
+
+``` python
+
+# --- Get one post record based on its post_id (path parameter):
+@app.get("/posts/{post_id}")
+def get_one_post(post_id: int, response: Response):
+    print(type(post_id))
+    for post in my_posts:
+        if post["id"] == post_id:
+            return {"post_data": post}
+    
+    error = response.status_code = 404        
+    return {"error": f"Post ID {post_id} not found",
+            "status": error }
+
+```
+
+In the event that the post_id is not found, the error returned will look like the below:
+
+``` json
+
+{
+    "error": "Post 3 not found",
+    "status": 404
+}
+
+```
