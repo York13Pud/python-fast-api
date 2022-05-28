@@ -1,6 +1,7 @@
 # --- Import the required modules:
+from email.policy import HTTP
 from typing import Optional
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
 
@@ -41,29 +42,23 @@ def get_all_posts():
 
 # --- Get one post record based on its post_id (path parameter):
 @app.get("/posts/{post_id}")
-def get_one_post(post_id: int, response: Response):
+def get_one_post(post_id: int):
     print(type(post_id))
     for post in my_posts:
         if post["id"] == post_id:
             return {"post_data": post}
     
-    error = response.status_code = 404        
-    return {"error": f"Post ID {post_id} not found",
-            "status": error }
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                        detail = f"Post ID {post_id} not found")
 
 
 # --- A post request that uses JSON from the Body of the request:
-@app.post("/posts")
+@app.post("/posts", status_code = status.HTTP_201_CREATED)
 def new_post(new_post: Post):
-    # --- Show the contents of the new_post pydantic model:
-    print(new_post)
-    
-    # --- Optional: You can convert the pydantic model to a dictionary:
-    print(new_post.dict())
     
     # --- Add the post to the my_posts list:
     my_posts.append(new_post.dict())
-    
+
     # --- Return the value of the post:
     return {"data": new_post.dict()}
 
@@ -72,9 +67,14 @@ def new_post(new_post: Post):
 def delete_post(post_id: int):
     for post in my_posts:
         if post["id"] == post_id:
+            # --- Delete the post from the list:
             my_posts.remove(post)
-            return {"post_id": post["id"], "status": "deleted"}
-    return {"error": "Post not found"}
+            raise HTTPException(status_code = status.HTTP_202_ACCEPTED,
+                                detail = f'{post["id"]} has been deleted')
+    
+    # --- If record can't be found, raise a 404    
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                        detail = f"Post ID {post_id} not found")
 
 
 # --- A simple post request:

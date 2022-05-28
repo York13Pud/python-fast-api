@@ -142,10 +142,11 @@ With the above list of three GET request paths, if you try to call all_posts, it
 
 ## Error Codes.
 
+### Method One: Hard Code The Error.
+
 You can specify an HTTP error code for when something occurs. In the below example, we will return a 404 (not found) if the post_id is not matched:
 
 ``` python
-
 # --- Get one post record based on its post_id (path parameter):
 @app.get("/posts/{post_id}")
 def get_one_post(post_id: int, response: Response):
@@ -154,19 +155,45 @@ def get_one_post(post_id: int, response: Response):
         if post["id"] == post_id:
             return {"post_data": post}
     
-    error = response.status_code = 404        
-    return {"error": f"Post ID {post_id} not found",
-            "status": error }
+    error = response.status_code = status.HTTP_404_NOT_FOUND       
+    return { "error": f"Post ID {post_id} not found" }
+```
+response: Response tracks the status code and we can set this to any valid HTTP code.
 
+NOTE: The above requires Response and status to be imported from the fastapi module.
+
+In the event that the post_id is not found, the error returned will look like the below:
+
+``` json
+{
+    "error": "Post 3 not found",
+    "status": 404
+}
+```
+
+In addition, the software that you are using will show 404 as the HTTP status.
+
+### Method Two: HTTPException.
+
+Whilst method one works, there is a cleaner way that uses the HTTPException method to present the HTTP staus. Using the example in method one, we can do the same as follows:
+
+``` python
+# --- Get one post record based on its post_id (path parameter):
+@app.get("/posts/{post_id}")
+def get_one_post(post_id: int):
+    print(type(post_id))
+    for post in my_posts:
+        if post["id"] == post_id:
+            return {"post_data": post}
+    
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                        detail = f"Post ID {post_id} not found")
 ```
 
 In the event that the post_id is not found, the error returned will look like the below:
 
 ``` json
-
 {
-    "error": "Post 3 not found",
-    "status": 404
+    "detail": "Post ID 3 not found"
 }
-
 ```
