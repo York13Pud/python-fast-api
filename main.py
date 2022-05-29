@@ -1,6 +1,7 @@
 # --- Import the required modules:
 from email.policy import HTTP
 from typing import Optional
+from urllib import response
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
@@ -60,7 +61,9 @@ def new_post(new_post: Post):
     my_posts.append(new_post.dict())
 
     # --- Return the value of the post:
-    return {"data": new_post.dict()}
+    return {"status_code": status.HTTP_201_CREATED,
+            "status_detail": "post has been created",
+            "data": new_post.dict()}
 
 
 @app.delete("/delete/{post_id}")
@@ -70,7 +73,7 @@ def delete_post(post_id: int):
             # --- Delete the post from the list:
             my_posts.remove(post)
             raise HTTPException(status_code = status.HTTP_202_ACCEPTED,
-                                detail = f'{post["id"]} has been deleted')
+                                detail = f'Post {post["id"]} has been deleted')
     
     # --- If record can't be found, raise a 404    
     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
