@@ -197,3 +197,17 @@ In the event that the post_id is not found, the error returned will look like th
     "detail": "Post ID 3 not found"
 }
 ```
+
+## Enumerate Function.
+
+Enumerate reads the list and produces a sequence number for each dictionary / entry in the list with the first number starting at 0. 
+
+For example, the below will take a list called my_posts, along with an id parameter / argument, enumerate it and if the id matches one of the dictionary id's, it will return the index number.
+
+``` python
+def find_index(id):
+    for index, post in enumerate(my_posts):
+        if post["id"] == id:
+            return index
+```
+
