@@ -222,7 +222,7 @@ def find_index(id):
 
 As part of Python, you can create packages that contain code to use in you API. A common practice is to use a folder to put the code in and also add a file called \_\_init\_\_.py. FastAPI / Python will then treat this folder as a package. An example would be to create a folder called app and then put some, or all of your code in there, along with an \_\_init\_\_.py file (which can be left empty if needed):
 
-```
+``` structured-text
 my_application
 |
 |___ README.md
@@ -247,3 +247,69 @@ uvicorn app.main:app --reload
 ```
 
 ## Databases.
+
+By default, once PostgreSQL is installed, it creates a default database called 'postgres'.
+
+Examples of datatypes for PostgreSQL:
+
+Numeric: integer, decimal and precision.
+Text: varchat and text.
+Bool: boolean.
+Sequence: array.
+
+Use unique constraints to enforce a column has a unique value.
+
+NULL constraints allow you to require a field to have a value and cannot be blank.
+
+### Sample SQL Queries.
+
+#### SELECT and WHERE.
+Get products named Pencil or Remote:
+
+``` sql
+SELECT name, price, stock_level FROM products WHERE name='Pencil' OR name='Remote';
+```
+
+Get products that have no stock:
+
+``` sql
+SELECT name, price, stock_level FROM products WHERE stock_level=0;
+```
+
+Get products that have stock higher than 0:
+
+``` sql
+SELECT name, price, stock_level FROM products WHERE stock_level > 0;
+```
+
+#### ORDER BY and ASC and DESC.
+
+
+Get products that have stock higher than 0 and sort by stock level ascending:
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0 
+ORDER BY stock_level ASC;
+```
+
+Get products that have stock higher than 0 and sort by stock level descending:
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0 
+ORDER BY stock_level DESC;
+```
+
+#### AND & OR
+
+Get products that have stock higher than 0, with a price higher than 10 and sort by stock level descending:
+
+``` pgsql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0 AND price >= 10
+ORDER BY stock_level DESC;
+```
