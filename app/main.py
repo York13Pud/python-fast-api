@@ -7,8 +7,10 @@ from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
 
+
 # --- Create an instance of FastAPI
 app = FastAPI()
+
 
 # Define a schema model for the post using pydantic, which will also do validation:
 class Post(BaseModel):
@@ -25,10 +27,6 @@ class Post(BaseModel):
 my_posts = [{"id": 1, "title": "blog post 1", "content": "content of blog post 1"},
             {"id": 2, "title": "blog post 2", "content": "content of blog post 2"}]
 
-# --- Create a base route, also called a path operation:
-# Note app.get = a GET method. "/" is the URL path.
-@app.get("/")
-
 
 # --- Find the index of the post in the list.
 def find_index(id):
@@ -38,6 +36,10 @@ def find_index(id):
         if post["id"] == id:
             return index
 
+
+# --- Create a base route, also called a path operation:
+# Note app.get = a GET method. "/" is the URL path.
+@app.get("/")
 
 # --- Create a function for the path operation:
 # Note: async is optional. Only use async if the application (or the function) doesn't need to
@@ -80,6 +82,7 @@ def new_post(new_post: Post):
 @app.delete("/delete/{id}")
 def delete_post(id: int):
     index = find_index(id)
+    
     # --- If record can't be found, raise a 404    
     if index == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
@@ -89,10 +92,8 @@ def delete_post(id: int):
     my_posts.pop(index)
     
     raise HTTPException(status_code = status.HTTP_200_OK)
-    
-    
-
-
+  
+   
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
     index = find_index(id = id)
@@ -108,17 +109,6 @@ def update_post(id: int, post: Post):
     my_posts[index] = post_dict
     
     raise HTTPException(status_code = status.HTTP_200_OK)
-
-
-
-    
-    
-#    return {"message": "Post has been updated."}
-
-# --- A simple post request:
-@app.post("/test/{text}")
-def get_posts(text):
-    return {"text_value": text}
 
 
 

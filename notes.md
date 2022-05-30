@@ -38,9 +38,16 @@ Once the server is running, it will tell you what the URL it is running on and t
 
 [http://127.0.0.1:8000](http://127.0.0.1:8000 "http://127.0.0.1:8000")
 
-In addition, you can view the API docs at the below URL (it uses SwaggerUI to render):
+## Documentation.
 
+As part of FastAPI, the documentation is auto-generated. You can view the API docs at the below URL's. The difference is one uses SwaggerUI to render and the other uses redoc (respectively) to render the API documentation:
+
+SwaggerUI:
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs "http://127.0.0.1:8000/docs")
+
+Redoc:
+[http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc "http://127.0.0.1:8000/redoc")
+
 
 ## Post Request / Path Operation Example.
 
@@ -211,3 +218,32 @@ def find_index(id):
             return index
 ```
 
+## Python Packaging.
+
+As part of Python, you can create packages that contain code to use in you API. A common practice is to use a folder to put the code in and also add a file called \_\_init\_\_.py. FastAPI / Python will then treat this folder as a package. An example would be to create a folder called app and then put some, or all of your code in there, along with an \_\_init\_\_.py file (which can be left empty if needed):
+
+```
+my_application
+|
+|___ README.md
+|___ .gitignore
+|___ requirements.txt
+|
+|___venv
+|   |___ venv files
+|
+|___app
+|   |___ __init__.py
+|   |___ main.py
+|   |___ other-required-files
+|
+-
+
+```
+One additional thing you will need to do is to change the uvicorn path for the start file, if you moved it. For example, if we moved main.py into the app folder, we would start it by replacing main:app with app.main:app:
+
+``` console
+uvicorn app.main:app --reload
+```
+
+## Databases.
