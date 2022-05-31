@@ -267,19 +267,25 @@ NULL constraints allow you to require a field to have a value and cannot be blan
 Get products named Pencil or Remote:
 
 ``` sql
-SELECT name, price, stock_level FROM products WHERE name='Pencil' OR name='Remote';
+SELECT name, price, stock_level
+FROM products 
+WHERE name='Pencil' OR name='Remote';
 ```
 
 Get products that have no stock:
 
 ``` sql
-SELECT name, price, stock_level FROM products WHERE stock_level=0;
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level=0;
 ```
 
 Get products that have stock higher than 0:
 
 ``` sql
-SELECT name, price, stock_level FROM products WHERE stock_level > 0;
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0;
 ```
 
 #### ORDER BY and ASC and DESC.
@@ -307,7 +313,7 @@ ORDER BY stock_level DESC;
 
 Get products that have stock higher than 0, with a price higher than 10 and sort by stock level descending:
 
-``` pgsql
+``` sql
 SELECT name, price, stock_level 
 FROM products 
 WHERE stock_level > 0 AND price >= 10
