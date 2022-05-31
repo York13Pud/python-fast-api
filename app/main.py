@@ -6,7 +6,8 @@ from urllib import response
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
-
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 # --- Create an instance of FastAPI
 app = FastAPI()
@@ -17,10 +18,22 @@ class Post(BaseModel):
     id: int
     title: str
     content: str
-    # published is an optional field as a default is assigned to it.
     published: bool = True
-    # This will have a default value of none / null.
-    rating: Optional[int] = None
+
+# Setup the connection to the database:
+try:
+    conn = psycopg2.connect(host="localhost", 
+                            dbname="fastapi", 
+                            user="neil", 
+                            password="Gr1ml0ck1",
+                            cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    print("Connected to DB")
+    
+except Exception as error:
+    print("error connecting to DB")
+    print(error)
+
 
 
 # --- Create a variable with an empty list to store the posts (temp solution until DB ready.)

@@ -440,18 +440,10 @@ To add data to a table, you use the INSERT operator. For example:
 Add a record to the table named products:
 
 ``` sql
-INSERT INTO products (
-    name, 
-    price, 
-    on_sale, 
-    stock_level
-    )
-VALUES (
-	'Webcam',
-	100,
-	false,
-	2348
-    );
+INSERT INTO products 
+    (name, price, on_sale, stock_level)
+VALUES 
+    ('Webcam', 100, false, 2348);
 ```
 
 Note: The order in the VALUES array must match the order in the INSERT (first) array. Also, make sure that the datatypes are correct for each column / value.
@@ -471,17 +463,57 @@ If you would like to see the inserted data after it has been added, you can use 
 Create a new record in the products table and return a few of the columns instead of a success message:
 
 ``` sql
-INSERT INTO products (
-    name, 
-    price, 
-    on_sale, 
-    stock_level
-    )
-VALUES (
-	'Webcam',
-	100,
-	false,
-	2348
-    )
+INSERT INTO products 
+    (name, price, on_sale, stock_level)
+VALUES 
+    ('Webcam', 100, false, 2348)
 RETURNING id, name, price, stock_level;
+```
+
+To insert multiple records, you can pass multiple array in the values section:
+
+``` sql
+INSERT INTO products 
+    (name, price, on_sale, stock_level)
+VALUES 
+    ('Webcam',100,false,2348),
+    ('Tractor',1000000,false,0),
+    ('PS5',450,false,1)
+RETURNING id, name, price, stock_level;
+```
+
+### Delete Records.
+
+To delete a record from the products table:
+``` sql
+DELETE FROM products WHERE id = 12;
+```
+
+To delete a record from the products table and see what it was before it was deleted, you can use the returning operator:
+``` sql
+DELETE FROM products WHERE id = 12 RETURNING id, name;
+```
+
+To delete multiple records from the products table using the id column:
+``` sql
+DELETE FROM products WHERE id IN (1,2);
+```
+
+To delete multiple records based on a criteria rather than a fixed record, you can do the following (delete all products with price > 100):
+``` sql
+DELETE FROM products WHERE price > 100 RETURNING id, name;
+```
+
+### Updating Records.
+
+To update a record, you can do this using the UPDATE operator and SET operator. For example:
+
+``` sql
+UPDATE products SET name='USB Microphone', price=123 WHERE id = 5 RETURNING id, name, price;
+```
+
+To update multiple records by a criteria, it's simple to do. For example:
+
+``` sql
+UPDATE products SET on_sale=true WHERE id > 6  RETURNING id, name, price, on_sale;
 ```
