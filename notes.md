@@ -182,7 +182,7 @@ In addition, the software that you are using will show 404 as the HTTP status.
 
 ### Method Two: HTTPException.
 
-Whilst method one works, there is a cleaner way that uses the HTTPException method to present the HTTP staus. Using the example in method one, we can do the same as follows:
+Whilst method one works, there is a cleaner way that uses the HTTPException method to present the HTTP status. Using the example in method one, we can do the same as follows:
 
 ``` python
 # --- Get one post record based on its post_id (path parameter):
@@ -253,7 +253,7 @@ By default, once PostgreSQL is installed, it creates a default database called '
 Examples of datatypes for PostgreSQL:
 
 Numeric: integer, decimal and precision.
-Text: varchat and text.
+Text: varchar and text.
 Bool: boolean.
 Sequence: array.
 
@@ -309,6 +309,15 @@ WHERE stock_level > 0
 ORDER BY stock_level DESC;
 ```
 
+Get products that have stock higher than 0 and sort by stock level descending and price ascending if there is a conflict with two records having the same stock level:
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0 
+ORDER BY stock_level DESC, price ASC;
+```
+
 #### AND & OR
 
 Get products that have stock higher than 0, with a price higher than 10 and sort by stock level descending:
@@ -318,4 +327,161 @@ SELECT name, price, stock_level
 FROM products 
 WHERE stock_level > 0 AND price >= 10
 ORDER BY stock_level DESC;
+```
+
+Get products that have stock higher than 100, or has a name of Pencil and sort by stock level descending:
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 100 OR name = 'Pencil'
+ORDER BY stock_level DESC;
+```
+
+#### IN Operator
+
+The IN operator allows you to pass an array of values to query rather than typing out a lot of OR statements. For example:
+
+Get products that have an id of 1, 2 or 3:
+
+Method one, multiple OR operations:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE id = 1 OR id = 2 OR id = 3
+ORDER BY stock_level DESC;
+```
+
+Method two, using the IN operator:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE id IN (1,2,3)
+ORDER BY stock_level DESC;
+```
+
+#### LIKE Operator
+
+The LIKE operator allows you to perform queries that search for a value based on partial information. For example:
+
+Find all records that contain the word TV in the name column:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE name LIKE '%TV%'
+ORDER BY stock_level DESC;
+```
+
+Find all records that end with the word TV in the name column:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE name LIKE '%TV'
+ORDER BY stock_level DESC;
+```
+
+Find all records that start with the word TV in the name column:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE name LIKE 'TV%'
+ORDER BY stock_level DESC;
+```
+
+You can combine LIKE with the NOT operator to return a reverse of what was searched for. For example:
+
+Find all records that don't contain the word TV in the name column:
+
+``` sql
+SELECT id, name, price, stock_level 
+FROM products 
+WHERE name NOT LIKE '%TV%'
+ORDER BY stock_level DESC;
+```
+
+#### LIMIT Operator.
+
+You can limit the number of records returned by using the LIMIT operator. For example:
+
+Show only the first 5 items that are found from this query:
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0
+ORDER BY stock_level DESC
+LIMIT 5;
+```
+
+#### OFFSET Operator.
+
+OFFSET can be used to ignore the first x number of results that have been found and show x results from what you offset by. For example:
+
+Show only 5 items that are found from this query with the first two being skipped (5 results will show bu they will be 3 to 7 as 1 and 2 are skipped (offset)):
+
+``` sql
+SELECT name, price, stock_level 
+FROM products 
+WHERE stock_level > 0
+ORDER BY stock_level DESC
+LIMIT 5
+OFFSET 2;
+```
+
+### Sample SQL Data Insertions.
+
+To add data to a table, you use the INSERT operator. For example:
+
+Add a record to the table named products:
+
+``` sql
+INSERT INTO products (
+    name, 
+    price, 
+    on_sale, 
+    stock_level
+    )
+VALUES (
+	'Webcam',
+	100,
+	false,
+	2348
+    );
+```
+
+Note: The order in the VALUES array must match the order in the INSERT (first) array. Also, make sure that the datatypes are correct for each column / value.
+
+If the insertion is successful, will get a message similar to the following:
+
+``` console
+INSERT 0 1
+
+Query returned successfully in 25 msec.
+```
+
+If it wasn't successful, you will get an error indicating where the issue is in the query.
+
+If you would like to see the inserted data after it has been added, you can use the RETURNING operator to do this. For example:
+
+Create a new record in the products table and return a few of the columns instead of a success message:
+
+``` sql
+INSERT INTO products (
+    name, 
+    price, 
+    on_sale, 
+    stock_level
+    )
+VALUES (
+	'Webcam',
+	100,
+	false,
+	2348
+    )
+RETURNING id, name, price, stock_level;
 ```
