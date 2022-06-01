@@ -1,9 +1,7 @@
 # --- Import the required modules:
-from email.policy import HTTP
+from hmac import new
 from operator import index
 from time import sleep
-from typing import Optional
-from urllib import response
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
@@ -16,7 +14,7 @@ app = FastAPI()
 
 # Define a schema model for the post using pydantic, which will also do validation:
 class Post(BaseModel):
-    id: int
+    # id: int
     title: str
     content: str
     published: bool = True
@@ -33,7 +31,8 @@ while connection_successful is False:
         conn = psycopg2.connect(host="localhost", 
                                 dbname="fastapi", 
                                 user="postgres", 
-                                password=""
+                                password="",
+                                cursor_factory=RealDictCursor
                                 )
         
         # --- Create a cursor to allow execution of commands:
@@ -47,7 +46,7 @@ while connection_successful is False:
         while query_successful is False:
             try:
                 cursor.execute("SELECT * FROM posts;")
-                print(cursor.fetchall())
+                print(cursor.fetchone())
                 query_successful = True
                 
             # Display an error if the query fails:    
@@ -92,7 +91,10 @@ async def root():
 # --- Get all posts:
 @app.get("/posts")
 def get_all_posts():
-    return {"all_posts": my_posts}
+    cursor.execute("SELECT * FROM posts;")
+    posts = cursor.fetchall()
+    print(posts)
+    return {"all_posts": posts}
 
 
 # --- Get one post record based on its post_id (path parameter):
@@ -111,18 +113,28 @@ def get_one_post(post_id: int):
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def new_post(new_post: Post):
     
-    # --- Add the post to the my_posts list:
-    my_posts.append(new_post.dict())
-
+    # Create a new SQL query to write the record:
+    cursor.execute("""INSERT INTO posts (title, content, published) 
+                      VALUES (%s, %s, %s) 
+                      RETURNING *;""",
+                      (new_post.title, new_post.content, new_post.published))
+    
+    # --- Get the details of the new record and assign it to a variable:
+    new_post = cursor.fetchone()
+    
+    # --- Commit the record to the table. Without this, the record will not be inserted into the table:
+    conn.commit()
+    
     # --- Return the value of the post:
     return {"status_code": status.HTTP_201_CREATED,
             "status_detail": "post has been created",
-            "data": new_post.dict()}
+            "data": new_post
+            }
 
 
 @app.delete("/delete/{id}")
 def delete_post(id: int):
-    index = find_index(id)
+    # index = find_index(id)
     
     # --- If record can't be found, raise a 404    
     if index == None:
@@ -130,8 +142,15 @@ def delete_post(id: int):
                             detail = f"Post ID {id} not found")
     
     # Remove the index from the list:
-    my_posts.pop(index)
-    
+    # my_posts.pop(index)
+    print(f"{id}")
+    try:
+        cursor.execute("""DELETE FROM posts WHERE id = %s""",(id))
+        conn.commit()
+    except Exception as error:
+                print("error getting data from table")    
+                print(error)
+        
     raise HTTPException(status_code = status.HTTP_200_OK)
   
    
