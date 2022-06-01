@@ -517,3 +517,69 @@ To update multiple records by a criteria, it's simple to do. For example:
 ``` sql
 UPDATE products SET on_sale=true WHERE id > 6  RETURNING id, name, price, on_sale;
 ```
+
+### Psycopg2.
+
+Psycopg2 (or Psycopg3) is a driver to allow Python to interact with a PostgreSQL database by using standard SQL commands, just like you normally would with say pgAdmin or the pgsql CLI.
+
+To use it, you need to install it via pip, import the module and then create a connection to the database server.
+
+``` python
+# --- Import the required modules:
+# --- RealDictCursor will show the column names for each column in a table as part of the response and format it as JSON.
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+# --- Setup the connection:
+conn = psycopg2.connect(host="hostname or ip_address", 
+                        dbname="database_name", 
+                        user="usernames", 
+                        password="password",
+                        cursor_factory=RealDictCursor
+                        )
+# --- Create a cursor to allow execution of commands:
+cursor = conn.cursor()
+print("Connected to DB")
+```
+
+Once the connection is made, you can start to pass queries to it. For example, get all the records in a table:
+``` python
+# --- Get all posts:
+@app.get("/posts")
+def get_all_posts():
+    # --- Query the table to return all of the records stored in it:
+    cursor.execute("SELECT * FROM posts;")
+
+    # --- Define a variable that will grab all of the records that are returned from the last cursor.execute command:
+    posts = cursor.fetchall()
+    
+    # --- Return all of the records as JSON:
+    return {"all_posts": posts}
+```
+
+Another example would be to delete a record. The below example covers that but you can change out the SQL query for other actions, such as updating a record:
+
+``` python
+@app.delete("/delete/{id}")
+def delete_post(id: int):
+    # Create a new SQL query to delete the record:
+    cursor.execute("""DELETE FROM posts 
+                        WHERE id = %s 
+                        RETURNING *;""", [id])
+    # --- Define a variable that will grab the record from the last cursor.execute command. We use fetchone instead of fetchall as we should only ever get one back:
+    post = cursor.fetchone()
+    
+    # --- Commit the query to the table. If you don't do this the record will not be deleted from the table.
+    conn.commit()
+
+    if post == None:
+        print("error")
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                            detail = f"Post ID {id} not found")
+
+    # --- Set the HTTP return code to 204 to indicate to the API requester that the record has been deleted:
+    raise HTTPException(status_code = status.HTTP_204_NO_CONTENT)  
+```
+
+Note: HTTP 204 will return no data back to the API requester. It will only return back a 204.
+
