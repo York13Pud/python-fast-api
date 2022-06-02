@@ -583,3 +583,21 @@ def delete_post(id: int):
 
 Note: HTTP 204 will return no data back to the API requester. It will only return back a 204.
 
+### Object Relational Mapper (ORM).
+
+An ORM is a layer of abstraction that sits between Python and the database. In effect, it will take code that is Python-based, convert it into SQL and then run those queries against the database and return whatever is needed in a Python friendly (dictionaries / lists) format. As a result, you no longer need to write out any SQL queries!
+
+For Python, we would typically use SQLAlchemy as our ORM.
+
+#### Install SQLAlchemy
+
+``` console
+pip install sqlalchemy
+```
+
+You will also need a driver for Python to connect to PostgreSQL. We will use psycopg2 again for this.
+
+``` console
+pip install psycopg2-binary
+```
+
