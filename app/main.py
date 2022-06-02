@@ -77,7 +77,7 @@ async def root():
 # --- Get all posts:
 @app.get("/posts")
 def get_all_posts():
-    cursor.execute("SELECT * FROM posts;")
+    cursor.execute("SELECT * FROM posts ORDER BY id ASC;")
     posts = cursor.fetchall()
     print(posts)
     return {"all_posts": posts}
