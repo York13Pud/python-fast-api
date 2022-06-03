@@ -2,12 +2,17 @@
 from hmac import new
 from operator import index
 from time import sleep
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
-import psycopg2
+from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
+from app import models
+from app.database import engine, get_db
+import psycopg2
 
+# --- Build the database engine, along with the tables in the models file:
+models.Base.metadata.create_all(bind = engine)
 
 # --- Create an instance of FastAPI
 app = FastAPI()
@@ -172,6 +177,8 @@ def update_post(id: int, post: Post):
             }
 
 
-
+@app.get("/test")
+def test(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 
