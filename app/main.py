@@ -1,6 +1,4 @@
 # --- Import the required modules:
-from hmac import new
-from operator import index
 from time import sleep
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
