@@ -93,8 +93,7 @@ def get_all_posts(db: Session = Depends(get_db)):
 def get_one_post(id: int, db: Session = Depends(get_db)):
 
     try:
-        cursor.execute("""SELECT * FROM posts WHERE id = %s""",[id])
-        post = cursor.fetchone()
+        post = db.query(models.Post).filter(models.Post.id == id).first()
         return {"data": post}
     
     except Exception as error:
@@ -106,10 +105,16 @@ def get_one_post(id: int, db: Session = Depends(get_db)):
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def new_post(post: Post, db: Session = Depends(get_db)):
     
-    new_post = models.Post(title = post.title,
-                content = post.content,
-                published = post.published
-    )
+    # --- Method one (more granular): Construct the details for the post request by specific columns:
+    # new_post = models.Post( **post.dict() )
+                # title = post.title,
+                # content = post.content,
+                # published = post.published
+    # )
+    
+    # --- Method two (easier for large schema): Construct the details for the post request by taking all the data passed, convert it to a dictionary and
+    # --- then strip (**) out the parts that make it a dictionary:
+    new_post = models.Post( **post.dict() )
     
     # --- Add the post to the table. You must use commit to write the post tot the table:
     db.add(new_post)
@@ -132,21 +137,24 @@ def new_post(post: Post, db: Session = Depends(get_db)):
 
 # --- Delete a post:
 @app.delete("/delete/{id}")
-def delete_post(id: int):
-    # Create a new SQL query to delete the record:
-    cursor.execute("""DELETE FROM posts 
-                        WHERE id = %s 
-                        RETURNING *;""", [id])
+def delete_post(id: int, db: Session = Depends(get_db)):
+    try:
+        post = db.query(models.Post).filter(models.Post.id == id).first()
+        db.delete(post)
+        db.commit()
     
-    post = cursor.fetchone()
-    conn.commit()
-
-    if post == None:
-        print("error")
+    except Exception as error:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = f"Post ID {id} not found")
+    
+    
+    # if post == None:
+    #     print("error")
+    #     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+    #                         detail = f"Post ID {id} not found")
         
-    raise HTTPException(status_code = status.HTTP_204_NO_CONTENT)    
+    raise HTTPException(status_code = status.HTTP_200_OK,
+                        detail = f"Post {id} has been deleted.")
 
 
 # --- Update a post:   

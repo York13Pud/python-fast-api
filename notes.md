@@ -614,5 +614,5 @@ These files will then be imported into the main.py file, along with the followin
 models.Base.metadata.create_all(bind = engine)
 ```
 
-Note: SQLAlchemy will not update tables in the models if the table already exists. If schema changes need to be made, this is called a migration and is handled by another library called 
+Note: SQLAlchemy will not update tables in the models if the table already exists. If schema changes need to be made, this is called a migration and is handled by another library called Alembic.
 
