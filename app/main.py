@@ -16,7 +16,8 @@ models.Base.metadata.create_all(bind = engine)
 app = FastAPI()
 
 
-# Define a schema model for the post using pydantic, which will also do validation:
+# --- Define a schema model for the post using pydantic, which will also do validation:
+# --- To be deleted once post and put methods have been migrated to SQLAlchemy driven methods.
 class Post(BaseModel):
     # id: int
     title: str
@@ -79,16 +80,17 @@ async def root():
 
 # --- Get all posts:
 @app.get("/posts")
-def get_all_posts():
-    cursor.execute("SELECT * FROM posts ORDER BY id ASC;")
-    posts = cursor.fetchall()
-    print(posts)
-    return {"all_posts": posts}
+def get_all_posts(db: Session = Depends(get_db)):
+    # --- Get all the data from the table.
+    # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
+    posts = db.query(models.Post).all()
+        
+    return { "data": posts }
 
 
 # --- Get one post record based on its id (path parameter):
 @app.get("/posts/{id}")
-def get_one_post(id: int):
+def get_one_post(id: int, db: Session = Depends(get_db)):
 
     try:
         cursor.execute("""SELECT * FROM posts WHERE id = %s""",[id])
@@ -102,22 +104,22 @@ def get_one_post(id: int):
 
 # --- Create a post:
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
-def new_post(post: Post):
+def new_post(post: Post, db: Session = Depends(get_db)):
     
-    # Create a new SQL query to write the record:
-    cursor.execute("""INSERT INTO posts (title, content, published) 
-                      VALUES (%s, %s, %s) 
-                      RETURNING *;""",
-                      [post.title, post.content, post.published])
+    new_post = models.Post(title = post.title,
+                content = post.content,
+                published = post.published
+    )
     
-    # --- Get the details of the new record and assign it to a variable:
-    post = cursor.fetchone()
+    # --- Add the post to the table. You must use commit to write the post tot the table:
+    db.add(new_post)
+    db.commit()
     
-    # --- Commit the record to the table. Without this, the record will not be inserted into the table:
-    conn.commit()
+    # --- Use refresh to update new_post with the details of the newly written post:
+    db.refresh(new_post)
     
     # --- If the post cannot be created, show an error:
-    if not post:
+    if not new_post:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = "Post could not be created.")   
     
@@ -175,8 +177,12 @@ def update_post(id: int, post: Post):
             }
 
 
-@app.get("/test")
-def test(db: Session = Depends(get_db)):
-    return {"status": "success"}
+# @app.get("/test")
+# def test(db: Session = Depends(get_db)):
+#     # --- Get all the data from the table.
+#     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
+#     posts = db.query(models.Post).all()
+        
+#     return { "data": posts }
 
 

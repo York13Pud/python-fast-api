@@ -589,7 +589,7 @@ An ORM is a layer of abstraction that sits between Python and the database. In e
 
 For Python, we would typically use SQLAlchemy as our ORM.
 
-#### Install SQLAlchemy
+#### Install SQLAlchemy.
 
 ``` console
 pip install sqlalchemy
@@ -600,4 +600,19 @@ You will also need a driver for Python to connect to PostgreSQL. We will use psy
 ``` console
 pip install psycopg2-binary
 ```
+
+#### Setup Database Connection and Tables.
+
+Once installed, you would typically create two files:
+* database.py - This file contains the code that is used to connect to the database server and the required database(s).
+* models.py - This file contains all of the table schemas for the database you are using.
+
+These files will then be imported into the main.py file, along with the following code to allow you to use the database. Place it above the line where you create the app:
+
+``` python
+# --- Build the database engine, along with the tables in the models file:
+models.Base.metadata.create_all(bind = engine)
+```
+
+Note: SQLAlchemy will not update tables in the models if the table already exists. If schema changes need to be made, this is called a migration and is handled by another library called 
 

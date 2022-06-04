@@ -15,11 +15,11 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# --- Define the base:
+# --- Define the base that can be used with other callable classes, such as a class to make a Table:
 Base = declarative_base()
 
 
-# Dependency
+# --- Execute the connection to the database and close it when finished:
 def get_db():
     db = SessionLocal()
     try:
