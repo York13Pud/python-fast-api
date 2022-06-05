@@ -1,4 +1,5 @@
 # --- Import the required modules:
+from typing import Optional, List
 from time import sleep
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
 from app import models
 from app.database import engine, get_db
-from app.schemas import Post, PostCreate
+from app.schemas import PostCreate, PostResponse
 import psycopg2
 
 
@@ -72,7 +73,7 @@ async def root():
 
 
 # --- Get all posts:
-@app.get("/posts")
+@app.get("/posts", response_model = List[PostResponse])
 def get_all_posts(db: Session = Depends(get_db)):
     # --- Get all the data from the table.
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
@@ -82,7 +83,7 @@ def get_all_posts(db: Session = Depends(get_db)):
 
 
 # --- Get one post record based on its id (path parameter):
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model = PostResponse)
 def get_one_post(id: int, db: Session = Depends(get_db)):
 
     try:
@@ -95,7 +96,7 @@ def get_one_post(id: int, db: Session = Depends(get_db)):
 
 
 # --- Create a post:
-@app.post("/posts", status_code = status.HTTP_201_CREATED)
+@app.post("/posts", status_code = status.HTTP_201_CREATED, response_model = PostResponse)
 def new_post(post: PostCreate, db: Session = Depends(get_db)):
     
     # --- Method one (more granular): Construct the details for the post request by specific columns:
@@ -126,7 +127,7 @@ def new_post(post: PostCreate, db: Session = Depends(get_db)):
 
 
 # --- Delete a post:
-@app.delete("/delete/{id}")
+@app.delete("/delete/{id}", response_model = PostResponse)
 def delete_post(id: int, db: Session = Depends(get_db)):
     try:
         post = db.query(models.Post).filter(models.Post.id == id).first()
