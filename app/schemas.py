@@ -2,6 +2,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+######## --- Requests --- ########
 
 # --- Define a schema model for the post using pydantic, which will also do validation:
 # --- To be deleted once post and put methods have been migrated to SQLAlchemy driven methods.
@@ -14,6 +15,10 @@ class Post(BaseModel):
 class PostCreate(Post):
     pass
 
+
+
+
+######## --- Responses --- ########
 
 # --- Create a class that will be used by the create_post function to return a response that has been validated
 # --- and type checked before returning it to the user. Notice that there are only two fields. That is because
