@@ -1,14 +1,19 @@
 # --- Import the required modules:
-from typing import Optional, List
-from time import sleep
-from fastapi import FastAPI, Response, status, HTTPException, Depends
-from fastapi.params import Body
-from sqlalchemy.orm import Session
-from psycopg2.extras import RealDictCursor
 from app import models
+from app.auth.hash_pwd import hash_pwd
 from app.database import engine, get_db
 from app.schemas import PostCreate, PostResponse, UserCreate, UserCreateResponse
+
+from fastapi import FastAPI, Response, status, HTTPException, Depends
+from fastapi.params import Body
+
+from time import sleep
+from typing import Optional, List
+
 import psycopg2
+from psycopg2.extras import RealDictCursor
+
+from sqlalchemy.orm import Session
 
 
 # --- Build the database engine, along with the tables in the models file:
@@ -168,23 +173,39 @@ def update_post(id: int, post: PostCreate):
 
 
 
-# --- Create a post:
+# --- Create a user:
 @app.post("/users", status_code = status.HTTP_201_CREATED, response_model = UserCreateResponse)
 def new_user(user: UserCreate, db: Session = Depends(get_db)):
+    
+    # --- Hash the users password:
+    user.password = hash_pwd(user.password)
 
+    # --- Define a variable to create a user object / model:
     new_user = models.User( **user.dict() )
     
-    # --- Add the post to the table. You must use commit to write the post tot the table:
-    db.add(new_user)
-    db.commit()
+    try:
+        # --- Add the post to the table. You must use commit to write the post tot the table:
+        db.add(new_user)
+        db.commit()
+        
+        # --- Use refresh to update new_post with the details of the newly written post:
+        db.refresh(new_user)
     
-    # --- Use refresh to update new_post with the details of the newly written post:
-    db.refresh(new_user)
-    
-    # --- If the user cannot be created, show an error:
-    if not new_user:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-                            detail = "User could not be created.")   
+    except Exception as error:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
+                            detail = f"The email address {user.email} already exists. Please try with a different email address.")  
     
     # --- Return the value of the post:
     return new_user
+
+# @app.post("/test/{password}")
+# def testing(password):
+#     hashed = hash_pwd(password)
+#     if hashed == "$2b$12$5i8sRtWlzZ7he2Nz7lHYKOF8FttxmEtj6IdtZfB4zM32B5zv46jOC":
+#         return {"hash": hashed,
+#                 "comp": "$2b$12$5i8sRtWlzZ7he2Nz7lHYKOF8FttxmEtj6IdtZfB4zM32B5zv46jOC",
+#                 "match": True}
+#     else:
+#         return {"hash": hashed,
+#                 "comp": "$2b$12$5i8sRtWlzZ7he2Nz7lHYKOF8FttxmEtj6IdtZfB4zM32B5zv46jOC",
+#                 "match": False}
