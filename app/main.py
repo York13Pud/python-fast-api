@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
 from app import models
 from app.database import engine, get_db
-from app.schemas import PostCreate, PostResponse
+from app.schemas import PostCreate, PostResponse, UserCreate, UserCreateResponse
 import psycopg2
 
 
@@ -168,3 +168,23 @@ def update_post(id: int, post: PostCreate):
 
 
 
+# --- Create a post:
+@app.post("/users", status_code = status.HTTP_201_CREATED, response_model = UserCreateResponse)
+def new_user(user: UserCreate, db: Session = Depends(get_db)):
+
+    new_user = models.User( **user.dict() )
+    
+    # --- Add the post to the table. You must use commit to write the post tot the table:
+    db.add(new_user)
+    db.commit()
+    
+    # --- Use refresh to update new_post with the details of the newly written post:
+    db.refresh(new_user)
+    
+    # --- If the user cannot be created, show an error:
+    if not new_user:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                            detail = "User could not be created.")   
+    
+    # --- Return the value of the post:
+    return new_user

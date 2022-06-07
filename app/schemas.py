@@ -1,5 +1,5 @@
 # --- Import the required modules / libraries:
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 ######## --- Requests --- ########
@@ -16,6 +16,13 @@ class PostCreate(Post):
     pass
 
 
+class User(BaseModel):
+    email: EmailStr
+    password: str
+    
+    
+class UserCreate(User):
+    pass
 
 
 ######## --- Responses --- ########
@@ -25,7 +32,16 @@ class PostCreate(Post):
 # --- PostResponse is extending from Post, which means that in addition to what is in the Post class, PostResponse
 # --- will be adding id and created_at to the response, totalling five fields:
 class PostResponse(Post):
-    id: str
+    id: int
+    created_at: datetime
+    # --- This class will allow the pydantic library to return back a dictionary format:
+    class Config:
+        orm_mode = True
+        
+
+class UserCreateResponse(BaseModel):
+    id: int
+    email: EmailStr
     created_at: datetime
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
