@@ -46,3 +46,7 @@ class UserCreateResponse(BaseModel):
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
         orm_mode = True
+
+        
+class UserDetailsResponse(UserCreateResponse):
+    pass
