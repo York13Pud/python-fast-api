@@ -1,8 +1,9 @@
 # --- Import the required modules:
-from app  import models
+from app import models
 from app.database import get_db
 from app.schemas import PostCreate, PostResponse
 from fastapi import status, HTTPException, Depends, APIRouter
+from fastapi.param_functions import Query
 from typing import List
 from sqlalchemy.orm import Session
 
@@ -17,7 +18,11 @@ router = APIRouter(
 
 
 # --- Get all posts:
-@router.get("/", response_model = List[PostResponse])
+@router.get("/", 
+            name = "Get All Posts.", 
+            summary = "Returns the full list of available blog posts.", 
+            response_model = List[PostResponse])
+
 def get_all_posts(db: Session = Depends(get_db)):
     # --- Get all the posts from the table.
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
@@ -27,8 +32,12 @@ def get_all_posts(db: Session = Depends(get_db)):
 
 
 # --- Get one post record based on its id (path parameter):
-@router.get("/{id}", response_model = PostResponse)
-def get_one_post(id: int, db: Session = Depends(get_db)):
+@router.get("/{id}",
+            name = "Get A Single Posts.", 
+            summary = "Returns the details of a single blog posts.", response_model = PostResponse)
+
+def get_one_post(id: int = Query(..., description = "The ID number of the post you wish to return.", title="Post ID"),
+                 db: Session = Depends(get_db)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
