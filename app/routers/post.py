@@ -1,5 +1,5 @@
 # --- Import the required modules:
-from app import models
+from app  import models
 from app.database import get_db
 from app.schemas import PostCreate, PostResponse
 from fastapi import status, HTTPException, Depends, APIRouter
@@ -8,12 +8,18 @@ from sqlalchemy.orm import Session
 
 
 # --- Create a router variable that uses the APIRouter class:
-router = APIRouter()
+router = APIRouter(
+    # --- prefix will prefix /user to every route in this file. That way you don't
+    # --- need to use /user on every rout / path operation:
+    prefix = "/post",
+    tags = ["Posts"]
+    )
+
 
 # --- Get all posts:
-@router.get("/posts", response_model = List[PostResponse])
+@router.get("/", response_model = List[PostResponse])
 def get_all_posts(db: Session = Depends(get_db)):
-    # --- Get all the data from the table.
+    # --- Get all the posts from the table.
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
     posts = db.query(models.Post).all()
         
@@ -21,7 +27,7 @@ def get_all_posts(db: Session = Depends(get_db)):
 
 
 # --- Get one post record based on its id (path parameter):
-@router.get("/posts/{id}", response_model = PostResponse)
+@router.get("/{id}", response_model = PostResponse)
 def get_one_post(id: int, db: Session = Depends(get_db)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -34,7 +40,7 @@ def get_one_post(id: int, db: Session = Depends(get_db)):
 
 
 # --- Create a post:
-@router.post("/posts", status_code = status.HTTP_201_CREATED, response_model = PostResponse)
+@router.post("/", status_code = status.HTTP_201_CREATED, response_model = PostResponse)
 def new_post(post: PostCreate, db: Session = Depends(get_db)):
     
     new_post = models.Post( **post.dict() )
@@ -56,7 +62,7 @@ def new_post(post: PostCreate, db: Session = Depends(get_db)):
 
 
 # --- Delete a post:
-@router.delete("/delete/{id}", response_model = PostResponse)
+@router.delete("/{id}", response_model = PostResponse)
 def delete_post(id: int, db: Session = Depends(get_db)):
     try:
         post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -72,7 +78,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 # --- Update a post:   
-@router.put("/posts/{id}")
+@router.put("/{id}")
 def update_post(id: int, post: PostCreate, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     db.commit()

@@ -616,3 +616,67 @@ models.Base.metadata.create_all(bind = engine)
 
 Note: SQLAlchemy will not update tables in the models if the table already exists. If schema changes need to be made, this is called a migration and is handled by another library called Alembic.
 
+
+### Route File Separation and Path Prefix
+
+You can separate the routes / path operation up into different files by placing them in a routes folder in you apps directory.
+
+You can also use a path prefix with the file so that you don't have to type out a path each time. You also don't call a variable / constant for the path as it is done when you call the APIRouter.
+
+From there, you will need to make some changes to each of the routes and import the APIRouter class from FastAPI. An example route file (post.py) is shown below:
+
+``` python
+from app import models
+from app.database import get_db
+from app.schemas import PostCreate, PostResponse
+
+from fastapi import status, HTTPException, Depends, APIRouter
+
+from typing import List
+
+from sqlalchemy.orm import Session
+
+# --- Create a router variable that uses the APIRouter class:
+router = APIRouter(
+    # --- prefix will prefix /user to every route in this file. That way you don't
+    # --- need to use /user on every rout / path operation:
+    prefix="/post"
+    )
+
+# --- Get all posts:
+@router.get("/", response_model = List[PostResponse])
+def get_all_posts(db: Session = Depends(get_db)):
+    # --- Get all the data from the table.
+    # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
+    posts = db.query(models.Post).all()
+        
+    return posts
+```
+
+You then need to make a few changes to the main.py file:
+
+``` python
+# --- import the route files from the routers folder in the app package (folder):
+from app.routers import post, user
+
+# --- Reference the files that contain the routes / path operations for the application:
+app.include_router(post.router)
+app.include_router(user.router)
+```
+
+### API Documentation Grouping.
+
+As part of using route files, you can also group you API's up so that the documentation produced by SwaggerUI will group up the API actions by tag names. For example, all of the routes / path operations in the file called post.py should be grouped up using the name Posts:
+
+``` python
+# --- Create a router variable that uses the APIRouter class:
+router = APIRouter(
+    # --- prefix will prefix /user to every route in this file. That way you don't
+    # --- need to use /user on every rout / path operation:
+    prefix = "/post",
+    tags = ["Posts"]
+    )
+```
+
+You can use multiple tags if you wish as it is a list that is passed.
+

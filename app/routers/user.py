@@ -8,11 +8,16 @@ from sqlalchemy.orm import Session
 
 
 # --- Create a router variable that uses the APIRouter class:
-router = APIRouter()
+router = APIRouter(
+    # --- prefix will prefix /user to every route in this file. That way you don't
+    # --- need to use /user on every rout / path operation:
+    prefix = "/user",
+    tags = ["User"]
+    )
 
 
 # --- Create a user:
-@router.post("/users", status_code = status.HTTP_201_CREATED, response_model = UserCreateResponse)
+@router.post("/", status_code = status.HTTP_201_CREATED, response_model = UserCreateResponse)
 def new_user(user: UserCreate, db: Session = Depends(get_db)):
     
     # --- Hash the users password:
@@ -36,7 +41,7 @@ def new_user(user: UserCreate, db: Session = Depends(get_db)):
     # --- Return the value of the post:
     return new_user
 
-@router.get("/users/{id}", response_model=UserDetailsResponse)
+@router.get("/{id}", response_model=UserDetailsResponse)
 def get_user(id: int, db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.id == id).first()
