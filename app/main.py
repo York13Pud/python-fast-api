@@ -1,7 +1,7 @@
 # --- Import the required modules:
 from app import models
 from app.database import engine
-from app.routers import post, user
+from app.routers import auth, post, user
 
 from fastapi import FastAPI
 
@@ -74,8 +74,10 @@ while connection_successful is False:
 
 
 # --- Reference the files that contain the routes / path operations for the application:
+app.include_router(auth.router)
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 # --- Create a base route, also called a path operation:

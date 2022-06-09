@@ -25,6 +25,10 @@ class UserCreate(User):
     pass
 
 
+class UserLogin(User):
+    pass
+    
+
 ######## --- Responses --- ########
 
 # --- Create a class that will be used by the create_post function to return a response that has been validated

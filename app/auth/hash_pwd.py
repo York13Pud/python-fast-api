@@ -11,3 +11,20 @@ def hash_pwd(password: str):
     Required parameter / argument: password: string.
     """
     return pwd_context.hash(password)
+
+
+def verify_password_hash(plain_password:str, hashed_password:str):
+    """
+    Overview: 
+        This function will verify the password that the user sends when they 
+        login matches the password stored in the users table for that user.
+    
+    Args:
+        plain_password (string): This is the password the user entered when they sent the login request.
+        hashed_password (string): This is the hashed password that is stored in the database.
+
+    Returns:
+        Boolean: True if hashed passwords match, otherwise False.
+    """
+    # --- Verify that the passwords match and return true if so or false if not:
+    return pwd_context.verify(plain_password, hashed_password)
