@@ -680,3 +680,13 @@ router = APIRouter(
 
 You can use multiple tags if you wish as it is a list that is passed.
 
+### JWT: JSON Web Token Authentication
+
+JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for representing claims securely between two parties.
+
+00-jwt-token-auth-flow
+
+01-jwt-token-structure:
+
+* The payload part of the token can be read by other actors. Don't include any confidential info in there.
+* The token is not encrypted.
