@@ -55,8 +55,7 @@ def verify_access_token(token: str, credentials_exception):
         token_data = schemas.TokenData(id = user_id)
 
     # --- If a JWT related error occurs, raise an error using the credentials_exception variable:
-    except JWTError as error:
-        print(error)
+    except JWTError:
         raise credentials_exception
     
     # --- Return the token data
@@ -70,6 +69,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
                                           headers = {"WWW-Authenticate": "Bearer"}
                                           )
     
-    # --- Verift the access token:
+    # --- Verify the access token:
     return verify_access_token(token = token, 
                                credentials_exception = credentials_exception)

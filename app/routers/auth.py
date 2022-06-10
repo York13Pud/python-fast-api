@@ -22,8 +22,9 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(),
     
     # --- If the user cannot be found, raise a 404:
     if user == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail= "User not found. Please try again.")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail= "Invalid Credentials. Please Try Again.")
+
     
     # --- Check the password entered by the user matches the hashed password in the users table for that user:
     check_hash = verify_password_hash(plain_password = user_credentials.password, 
@@ -31,8 +32,8 @@ def login(user_credentials: OAuth2PasswordRequestForm = Depends(),
     
     # --- If check_has is false, raise a 404:
     if not check_hash:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail= "Invalid email address and / or password.")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail= "Invalid Credentials. Please Try Again.")
     
     # --- If the users password matches, generate a JWT bearer token:
     access_token = create_access_token(data = {"user_id": user.id})
