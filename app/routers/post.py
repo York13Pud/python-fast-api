@@ -1,5 +1,6 @@
 # --- Import the required modules:
 from app import models
+from app.auth.oauth2 import get_current_user
 from app.database import get_db
 from app.schemas import PostCreate, PostResponse
 from fastapi import status, HTTPException, Depends, APIRouter
@@ -21,7 +22,8 @@ router = APIRouter(
 @router.get("/", 
             name = "Get All Posts.", 
             summary = "Returns the full list of available blog posts.", 
-            response_model = List[PostResponse])
+            response_model = List[PostResponse]
+            )
 
 def get_all_posts(db: Session = Depends(get_db)):
     # --- Get all the posts from the table.
@@ -34,23 +36,29 @@ def get_all_posts(db: Session = Depends(get_db)):
 # --- Get one post record based on its id (path parameter):
 @router.get("/{id}",
             name = "Get A Single Posts.", 
-            summary = "Returns the details of a single blog posts.", response_model = PostResponse)
+            summary = "Returns the details of a single blog posts.", response_model = PostResponse
+            )
 
 def get_one_post(id: int = Query(..., description = "The ID number of the post you wish to return.", title="Post ID"),
-                 db: Session = Depends(get_db)):
+                 db: Session = Depends(get_db)
+                 ):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
     if post == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-                            detail = f"Post ID {id} not found")
+                            detail = f"Post ID {id} not found"
+                            )
 
     return post
 
 
 # --- Create a post:
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = PostResponse)
-def new_post(post: PostCreate, db: Session = Depends(get_db)):
+def new_post(post: PostCreate, 
+             db: Session = Depends(get_db), 
+             get_current_user: int = Depends(get_current_user)
+             ):
     
     new_post = models.Post( **post.dict() )
     

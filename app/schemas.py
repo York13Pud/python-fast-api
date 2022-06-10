@@ -1,6 +1,7 @@
 # --- Import the required modules / libraries:
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import Optional
 
 ######## --- Requests --- ########
 
@@ -28,6 +29,14 @@ class UserCreate(User):
 class UserLogin(User):
     pass
     
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    
+    
+class TokenData(BaseModel):
+    id: Optional[str] = None
 
 ######## --- Responses --- ########
 
