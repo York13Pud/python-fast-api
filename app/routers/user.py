@@ -1,6 +1,7 @@
 # --- Import the required modules:
 from app import models
 from app.auth.hash_pwd import hash_pwd
+from app.auth.oauth2 import get_current_user
 from app.database import get_db
 from app.schemas import UserCreate, UserCreateResponse, UserDetailsResponse
 from fastapi import status, HTTPException, Depends, APIRouter
@@ -17,8 +18,11 @@ router = APIRouter(
 
 
 # --- Create a user:
-@router.post("/", status_code = status.HTTP_201_CREATED, response_model = UserCreateResponse)
-def new_user(user: UserCreate, db: Session = Depends(get_db)):
+@router.post("/", status_code = status.HTTP_201_CREATED, 
+             response_model = UserCreateResponse)
+
+def new_user(user: UserCreate, 
+             db: Session = Depends(get_db)):
     
     # --- Hash the users password:
     user.password = hash_pwd(user.password)
@@ -41,9 +45,15 @@ def new_user(user: UserCreate, db: Session = Depends(get_db)):
     # --- Return the value of the post:
     return new_user
 
-@router.get("/{id}", response_model=UserDetailsResponse)
-def get_user(id: int, db: Session = Depends(get_db)):
+@router.get("/{id}", 
+            response_model=UserDetailsResponse)
 
+def get_user(id: int, 
+             db: Session = Depends(get_db),
+             current_user: int = Depends(get_current_user)):
+
+    print(current_user.email)
+    
     user = db.query(models.User).filter(models.User.id == id).first()
     
     if user == None:

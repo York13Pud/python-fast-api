@@ -4,6 +4,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
+from app.schemas import Token
 from app.auth.oauth2 import create_access_token
 from app.auth.hash_pwd import verify_password_hash
 
@@ -11,7 +12,7 @@ from app.auth.hash_pwd import verify_password_hash
 router = APIRouter(tags = ["Authentication"])
 
 
-@router.post("/login")
+@router.post("/login", response_model = Token)
 # --- Note: OAuth2PasswordRequestForm requires the credentials to be sent as a form rather than JSON body.
 # --- It requires a "username" and a "password" to be sent in the form.
 def login(user_credentials: OAuth2PasswordRequestForm = Depends(), 

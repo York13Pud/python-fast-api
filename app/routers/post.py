@@ -41,9 +41,12 @@ def get_all_posts(db: Session = Depends(get_db)):
             )
 
 def get_one_post(id: int = Query(..., description = "The ID number of the post you wish to return.", title="Post ID"),
-                 db: Session = Depends(get_db)
+                 db: Session = Depends(get_db),
+                 current_user: int = Depends(get_current_user)
                  ):
 
+    print(current_user)
+    
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
     if post == None:
@@ -58,10 +61,10 @@ def get_one_post(id: int = Query(..., description = "The ID number of the post y
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model = PostResponse)
 def new_post(post: PostCreate, 
              db: Session = Depends(get_db), 
-             user_id: int = Depends(get_current_user)
+             current_user: int = Depends(get_current_user)
              ):
     
-    print(user_id)
+    print(current_user)
     
     new_post = models.Post( **post.dict() )
     
@@ -85,10 +88,10 @@ def new_post(post: PostCreate,
 @router.delete("/{id}", response_model = PostResponse)
 def delete_post(id: int, 
                 db: Session = Depends(get_db), 
-                user_id: int = Depends(get_current_user)
+                current_user: int = Depends(get_current_user)
                 ):
     
-    print(user_id)
+    print(current_user)
     
     try:
         post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -107,10 +110,10 @@ def delete_post(id: int,
 @router.put("/{id}")
 def update_post(id: int, post: PostCreate, 
                 db: Session = Depends(get_db), 
-                user_id: int = Depends(get_current_user)
+                current_user: int = Depends(get_current_user)
                 ):
     
-    print(user_id)
+    print(current_user)
                     
     post = db.query(models.Post).filter(models.Post.id == id).first()
     db.commit()
