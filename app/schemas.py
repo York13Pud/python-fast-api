@@ -47,6 +47,7 @@ class TokenData(BaseModel):
 class PostResponse(Post):
     id: int
     created_at: datetime
+    owner_id: int
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
         orm_mode = True

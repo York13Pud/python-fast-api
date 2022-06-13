@@ -2,8 +2,8 @@
 from app.models import models
 from app.auth.oauth2 import get_current_user
 from app.database import get_db
-from app.schemas import PostCreate, PostResponse
-from fastapi import status, HTTPException, Depends, APIRouter
+from app.schemas import Post, PostCreate, PostResponse
+from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.param_functions import Query
 from typing import List
 from sqlalchemy.orm import Session
@@ -64,9 +64,9 @@ def new_post(post: PostCreate,
              current_user: int = Depends(get_current_user)
              ):
     
-    print(current_user)
+    print(f"Current User ID: {current_user.id}")
     
-    new_post = models.Post( **post.dict() )
+    new_post = models.Post(owner_id = current_user.id, **post.dict() )
     
     # --- Add the post to the table. You must use commit to write the post tot the table:
     db.add(new_post)
@@ -85,43 +85,57 @@ def new_post(post: PostCreate,
 
 
 # --- Delete a post:
-@router.delete("/{id}", response_model = PostResponse)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, 
                 db: Session = Depends(get_db), 
                 current_user: int = Depends(get_current_user)
                 ):
     
-    print(current_user)
+    post = db.query(models.Post).filter(models.Post.id == id).first()
     
-    try:
-        post = db.query(models.Post).filter(models.Post.id == id).first()
-        db.delete(post)
-        db.commit()
+    print(post.id)
+    print(current_user.id)
+    print(post.owner_id)
     
-    except Exception as error:
+    if post == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-                            detail = f"Post ID {id} not found")
-            
-    raise HTTPException(status_code = status.HTTP_200_OK,
-                        detail = f"Post {id} has been deleted.")
+                            detail = f"Post ID {id} not found")    
+    
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        
+    db.delete(post)
+    db.commit()
+                
+    return Response(status_code = status.HTTP_200_OK)
 
 
 # --- Update a post:   
-@router.put("/{id}")
-def update_post(id: int, post: PostCreate, 
+@router.put("/{id}", response_model=PostResponse)
+def update_post(id: int, 
+                updated_post: PostCreate, 
                 db: Session = Depends(get_db), 
                 current_user: int = Depends(get_current_user)
                 ):
     
-    print(current_user)
+    print(current_user.id)
                     
-    post = db.query(models.Post).filter(models.Post.id == id).first()
-    db.commit()
+    post_query = db.query(models.Post).filter(models.Post.id == id)
+    post = post_query.first()
+        
     
     # --- If the post cannot be created, show an error:
     if post == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = f"Post {id} not found.")   
     
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    
+    print(updated_post.dict())
+    
+    post_query.update(updated_post.dict(), synchronize_session=False)
+    db.commit()
+    
     # --- Return the value of the post:
-    return post
+    return post_query.first()

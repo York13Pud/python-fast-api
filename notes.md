@@ -690,3 +690,4 @@ JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for repre
 
 * The payload part of the token can be read by other actors. Don't include any confidential info in there.
 * The token is not encrypted.
+
