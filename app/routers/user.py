@@ -1,5 +1,5 @@
 # --- Import the required modules:
-from app import models
+from app.models import models
 from app.auth.hash_pwd import hash_pwd
 from app.auth.oauth2 import get_current_user
 from app.database import get_db

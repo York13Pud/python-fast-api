@@ -1,5 +1,5 @@
 from app.database import Base
-from sqlalchemy import Column, String, Integer, Boolean, TIMESTAMP
+from sqlalchemy import Column, String, Integer, Boolean, TIMESTAMP, ForeignKey
 from sqlalchemy.sql.expression import null, text
 
 
@@ -16,6 +16,7 @@ class Post(Base):
     content    = Column(String, nullable = False)
     published  = Column(Boolean, server_default = "TRUE", nullable = False)
     created_at = Column(TIMESTAMP(timezone = True), nullable = False, server_default = text("now()"))
+    owner_id   = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable = False)
     
 
 # --- Create a class for a user that is an extension of Base from the database.py file:

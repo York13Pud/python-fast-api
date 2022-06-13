@@ -1,7 +1,7 @@
 # --- Import the required modules / libraries:
 from app import schemas
 from app.database import get_db
-from app.models import User
+from app.models.models import User
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -17,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl = "login")
 # --- openssl rand -hex 32
 SECRET_KEY = "47e2ffb22ef6e8f134e5481228a2a3dd3c990a52e084bc399b616b576813254a"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 300
+ACCESS_TOKEN_EXPIRE_MINUTES = 30000
 
 def create_access_token(data: dict):
     # --- Make a copy of the data passed to the function:

@@ -1,5 +1,5 @@
 # --- Import the required modules:
-from app import models
+from app.models import models
 from app.database import engine
 from app.routers import auth, post, user
 

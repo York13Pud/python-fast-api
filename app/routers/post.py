@@ -1,5 +1,5 @@
 # --- Import the required modules:
-from app import models
+from app.models import models
 from app.auth.oauth2 import get_current_user
 from app.database import get_db
 from app.schemas import PostCreate, PostResponse
