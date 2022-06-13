@@ -33,6 +33,23 @@ def get_all_posts(db: Session = Depends(get_db)):
     return posts
 
 
+# --- Get all my posts:
+@router.get("/my-posts", 
+            name = "Get All Posts.", 
+            summary = "Returns the full list of available blog posts.", 
+            response_model = List[PostResponse]
+            )
+
+def get_all_posts(db: Session = Depends(get_db), 
+                  current_user: int = Depends(get_current_user)
+                  ):
+    # --- Get all the posts from the table.
+    # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
+    posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
+        
+    return posts
+
+
 # --- Get one post record based on its id (path parameter):
 @router.get("/{id}",
             name = "Get A Single Posts.", 
