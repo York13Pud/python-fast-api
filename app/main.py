@@ -1,8 +1,8 @@
 # --- Import the required modules:
-from app.models import models
+from app.config import settings
 from app.database import engine
+from app.models import models
 from app.routers import auth, post, root, user
-
 from fastapi import FastAPI
 
 

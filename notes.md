@@ -680,7 +680,7 @@ router = APIRouter(
 
 You can use multiple tags if you wish as it is a list that is passed.
 
-### JWT: JSON Web Token Authentication
+### JWT: JSON Web Token Authentication.
 
 JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for representing claims securely between two parties.
 
@@ -690,4 +690,41 @@ JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for repre
 
 * The payload part of the token can be read by other actors. Don't include any confidential info in there.
 * The token is not encrypted.
+
+
+### Environment Variables.
+
+Use these instead of hard coding things like passwords into the code.
+
+``` console
+export MY_ENV_VAR="hello"
+echo $MY_ENV_VAR
+```
+
+To access these in Python, you need to use the os module:
+
+``` python
+import os
+
+print(os.getenv("MY_ENV_VAR"))
+```
+
+You can use pydantic and a class to construct an object with all of the environment variables in so that you can access them but also have pydantic verify they exist. If they don't, it will error. 
+
+Pydantic BaseSettings is used to read environment variables. The name of the environment variable be be in uppercase or lowercase. Pydantic will convert it to uppercase to match that of the environment variable as they are in uppercase at the O/S level.
+
+For example:
+
+``` python
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    # --- Read the value of MY_ENV_VAR. If it is not found, default to localhost
+    MY_ENV_VAR: str = "localhost"
+    
+settings = Settings()
+
+print(settings.MY_ENV_VAR) 
+# --- prints hello or (if my_env_var is not defined) localhost.
+```
 
