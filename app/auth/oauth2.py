@@ -1,5 +1,6 @@
 # --- Import the required modules / libraries:
 from app import schemas
+from app.config import settings
 from app.database import get_db
 from app.models.models import User
 from datetime import datetime, timedelta
@@ -15,9 +16,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl = "login")
 # --- Three parts are needed:
 # --- The SECRET_KEY can be created using the following terminal command:
 # --- openssl rand -hex 32
-SECRET_KEY = "47e2ffb22ef6e8f134e5481228a2a3dd3c990a52e084bc399b616b576813254a"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30000
+SECRET_KEY = settings.secret_key
+# "47e2ffb22ef6e8f134e5481228a2a3dd3c990a52e084bc399b616b576813254a"
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 def create_access_token(data: dict):
     # --- Make a copy of the data passed to the function:
