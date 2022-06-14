@@ -5,7 +5,7 @@ from app.database import get_db
 from app.schemas import Post, PostCreate, PostResponse
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.param_functions import Query
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 
 
@@ -25,10 +25,17 @@ router = APIRouter(
             response_model = List[PostResponse]
             )
 
-def get_all_posts(db: Session = Depends(get_db)):
+def get_all_posts(db: Session = Depends(get_db),
+                  limit: int = 10,
+                  skip: int = 0,
+                  search: Optional[str] = ""
+                  ):
     # --- Get all the posts from the table.
+    # --- 
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit = limit).offset(offset = skip).all()
+ 
+    print(limit)
         
     return posts
 
