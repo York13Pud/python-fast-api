@@ -26,3 +26,48 @@ def get_db():
         yield db
     finally:
         db.close()
+
+        
+# --- Old psycopg2 connection method:
+
+# --- Setup the connection to the database:
+# connection_successful = False
+# query_successful = False
+
+
+# --- Attempt to connect to the database:
+# while connection_successful is False:
+#     try:
+#         # --- Setup the connection:
+#         conn = psycopg2.connect(host="localhost", 
+#                                 dbname="fastapi", 
+#                                 user="postgres", 
+#                                 password="",
+#                                 cursor_factory=RealDictCursor
+#                                 )
+        
+#         # --- Create a cursor to allow execution of commands:
+#         cursor = conn.cursor()
+#         print("Connected to DB")
+        
+#         # --- Set connection_successful to True to stop the loop:
+#         connection_successful = True
+        
+#         # --- Attempt to get the records in the database:
+#         while query_successful is False:
+#             try:
+#                 cursor.execute("SELECT * FROM posts;")
+#                 print(cursor.fetchone())
+#                 query_successful = True
+                
+#             # --- Display an error if the query fails:    
+#             except Exception as error:
+#                 print("error getting data from table")    
+#                 print(error)
+#                 sleep(5)
+                
+#     # --- Display an error if the connection fails:            
+#     except Exception as error:
+#         print("error connecting to DB")
+#         print(error)
+#         sleep(5)
