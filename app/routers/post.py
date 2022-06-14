@@ -35,8 +35,8 @@ def get_all_posts(db: Session = Depends(get_db)):
 
 # --- Get all my posts:
 @router.get("/my-posts", 
-            name = "Get All Posts.", 
-            summary = "Returns the full list of available blog posts.", 
+            name = "Get All My Posts.",
+            summary = "Returns the full list of available blog posts that the logged in user created.", 
             response_model = List[PostResponse]
             )
 
@@ -70,7 +70,10 @@ def get_one_post(id: int = Query(..., description = "The ID number of the post y
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = f"Post ID {id} not found"
                             )
-
+    
+    # if post.owner_id != current_user.id:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    
     return post
 
 
