@@ -728,3 +728,28 @@ print(settings.MY_ENV_VAR)
 # --- prints hello or (if my_env_var is not defined) localhost.
 ```
 
+Rather than setting the environment variables (for dev at least, don't do this for prod), you can use and environments variable file. This file is a simple one that contains the name and value of each environment variable. 
+
+The file name is typically .env. For example:
+
+``` python
+# --- .env file.
+MY_ENV_VAR=hello
+```
+
+You then just need to add a Config class to the Settings class that will then fill the matching variable(s) in the .env file:
+
+``` python
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    # --- Read the value of MY_ENV_VAR. If it is not found, default to localhost
+    MY_ENV_VAR: str = "localhost"
+    
+    class Config:
+        """This class will import all of the environment variables that you have set"""
+        env_file = ".env"
+
+settings = Settings()
+
+print(settings.MY_ENV_VAR)

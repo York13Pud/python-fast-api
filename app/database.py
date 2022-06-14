@@ -1,10 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
+from app.config import settings
 
 # --- Create a constant that will be used to point to and pass the user details to our database:
-SQLALCHEMY_DATABASE_URL = "postgresql://neil:password@localhost/fastapi"
+SQLALCHEMY_DATABASE_URL = f"{settings.database_type}://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 
 
 # --- Create an engine to connect to the database:
