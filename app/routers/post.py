@@ -2,7 +2,7 @@
 from app.models import models
 from app.auth.oauth2 import get_current_user
 from app.database import get_db
-from app.schemas import Post, PostCreate, PostResponse
+from app.schemas import PostCreate, PostResponse
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.param_functions import Query
 from typing import List, Optional
@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 
 # --- Create a router variable that uses the APIRouter class:
 router = APIRouter(
-    # --- prefix will prefix /user to every route in this file. That way you don't
-    # --- need to use /user on every rout / path operation:
+    # --- prefix will prefix /post to every route in this file. That way you don't
+    # --- need to use /post on every rout / path operation:
     prefix = "/post",
     tags = ["Posts"]
     )

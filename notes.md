@@ -518,6 +518,10 @@ To update multiple records by a criteria, it's simple to do. For example:
 UPDATE products SET on_sale=true WHERE id > 6  RETURNING id, name, price, on_sale;
 ```
 
+### Composite Keys.
+
+This is a primary key that spans multiple columns. For example, post_id and user_id can compose a composite key for a likes table to stop a user from liking a post more than once.
+
 ### Psycopg2.
 
 Psycopg2 (or Psycopg3) is a driver to allow Python to interact with a PostgreSQL database by using standard SQL commands, just like you normally would with say pgAdmin or the pgsql CLI.

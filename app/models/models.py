@@ -30,3 +30,13 @@ class User(Base):
     email      = Column(String, nullable = False, unique = True)
     password   = Column(String, nullable = False)
     created_at = Column(TIMESTAMP(timezone = True), nullable = False, server_default = text("now()"))
+    
+
+# --- Create a class that will create a table called votes:
+class Vote(Base):
+    # --- specify the table name to use.
+    __tablename__ = "votes"
+     
+    # --- Define the columns for this model:
+    post_id   = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key = True, nullable = False)
+    user_id   = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key = True, nullable = False)
