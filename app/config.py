@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     class Config:
         """This class will import all of the environment variables that you have set"""
+        case_sensitive = False
         env_file = ".env"
         
 # --- Create a variable that calls the Settings class to return an object with all of the required settings:    
