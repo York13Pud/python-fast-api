@@ -1,7 +1,7 @@
 # --- Import the required modules:
 from app.auth.oauth2 import get_current_user
 from app.database import get_db
-from app.models.models import Vote
+from app.models.models import Post, Vote
 from app.schemas import Voting
 
 from fastapi import status, HTTPException, Depends, APIRouter, Response
@@ -26,6 +26,11 @@ router = APIRouter(
 def vote(vote: Voting, 
          db: Session = Depends(get_db), 
          current_user: int = Depends(get_current_user)):
+    
+    post = db.query(Post).filter(Post.id == vote.post_id).first()
+    if not post:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, 
+                            detail = f"Post {vote.post_id} does not exist.")
     
     vote_query = db.query(Vote).filter(Vote.post_id == vote.post_id, Vote.user_id == current_user.id)
     found_vote = vote_query.first()
