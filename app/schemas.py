@@ -1,7 +1,8 @@
 # --- Import the required modules / libraries:
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 from typing import Optional
+
 
 ######## --- Requests --- ########
 
@@ -37,6 +38,19 @@ class Token(BaseModel):
     
 class TokenData(BaseModel):
     id: Optional[str] = None
+    
+
+class Voting(BaseModel):
+    post_id: int
+    dir: conint(ge=0,le=1)
+
+
+
+
+
+
+
+
 
 ######## --- Responses --- ########
 

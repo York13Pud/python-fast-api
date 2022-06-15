@@ -2,7 +2,7 @@
 from app.config import settings
 from app.database import engine
 from app.models import models
-from app.routers import auth, post, root, user
+from app.routers import auth, post, root, user, vote
 from fastapi import FastAPI
 
 
@@ -30,7 +30,7 @@ app.include_router(auth.router)
 app.include_router(post.router)
 app.include_router(root.router)
 app.include_router(user.router)
-
+app.include_router(vote.router)
 
 
 

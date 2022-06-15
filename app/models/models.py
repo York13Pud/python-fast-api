@@ -38,5 +38,5 @@ class Vote(Base):
     __tablename__ = "votes"
      
     # --- Define the columns for this model:
-    post_id   = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key = True, nullable = False)
-    user_id   = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key = True, nullable = False)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key = True, nullable = False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key = True, nullable = False)
