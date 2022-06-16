@@ -31,14 +31,18 @@ def get_all_posts(db: Session = Depends(get_db),
                   skip: int = 0,
                   search: Optional[str] = ""
                   ):
+    
     # --- Get all the posts from the table.
     # --- 
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit = limit).offset(offset = skip).all()
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes"))\
+                       .join(models.Vote, models.Vote.post_id == models.Post.id, isouter = True)\
+                       .group_by(models.Post.id)\
+                       .filter(models.Post.title.contains(search))\
+                       .limit(limit = limit)\
+                       .offset(offset = skip)\
+                       .all()
     
-    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter = True).group_by(models.Post.id).all()
-    #print(results)
-        
     return results
 
 
@@ -54,7 +58,9 @@ def get_all_posts(db: Session = Depends(get_db),
                   ):
     # --- Get all the posts from the table.
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
-    posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
+    posts = db.query(models.Post)\
+           .filter(models.Post.owner_id == current_user.id)\
+           .all()
         
     return posts
 
@@ -63,27 +69,28 @@ def get_all_posts(db: Session = Depends(get_db),
 @router.get("/{id}",
             name = "Get A Single Posts.", 
             summary = "Returns the details of a single blog posts.", 
-            response_model = PostResponse
+            response_model = AllPostsResponseVotes
             )
 
 def get_one_post(id: int = Query(..., description = "The ID number of the post you wish to return.", title="Post ID"),
-                 db: Session = Depends(get_db),
-                 current_user: int = Depends(get_current_user)
+                 db: Session = Depends(get_db)
                  ):
-
-    print(current_user)
     
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    
+    #post = db.query(models.Post).filter(models.Post.id == id).first()
 
-    if post == None:
+    result = db.query(models.Post, func.count(models.Vote.post_id)\
+             .label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter = True)\
+             .group_by(models.Post.id).where(models.Post.id == id)\
+             .first()
+    
+    
+    if result == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = f"Post ID {id} not found"
                             )
     
-    # if post.owner_id != current_user.id:
-    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-    
-    return post
+    return result
 
 
 # --- Create a post:
