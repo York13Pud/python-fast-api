@@ -2,10 +2,11 @@
 from app.models import models
 from app.auth.oauth2 import get_current_user
 from app.database import get_db
-from app.schemas import PostCreate, PostResponse
+from app.schemas import PostCreate, PostResponse, AllPostsResponseVotes
 from fastapi import status, HTTPException, Depends, APIRouter, Response
 from fastapi.param_functions import Query
 from typing import List, Optional
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 
@@ -22,7 +23,7 @@ router = APIRouter(
 @router.get("/", 
             name = "Get All Posts.", 
             summary = "Returns the full list of available blog posts.", 
-            response_model = List[PostResponse]
+            response_model = List[AllPostsResponseVotes]
             )
 
 def get_all_posts(db: Session = Depends(get_db),
@@ -34,10 +35,11 @@ def get_all_posts(db: Session = Depends(get_db),
     # --- 
     # --- Note: if you remove .all(), the result will be the actual SQL query that SQLAlchemy translates the ORM request to:
     posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit = limit).offset(offset = skip).all()
- 
-    print(limit)
+    
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter = True).group_by(models.Post.id).all()
+    #print(results)
         
-    return posts
+    return results
 
 
 # --- Get all my posts:

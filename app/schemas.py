@@ -12,7 +12,7 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = True
-
+    
 
 class PostCreate(Post):
     pass
@@ -75,7 +75,20 @@ class PostResponse(Post):
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
         orm_mode = True
+
+class AllPostResponse(Post):
+    id: int
+    created_at: datetime
+    # --- This class will allow the pydantic library to return back a dictionary format:
+    class Config:
+        orm_mode = True
         
+class AllPostsResponseVotes(BaseModel):
+    Post: AllPostResponse
+    votes: int
+    # --- This class will allow the pydantic library to return back a dictionary format:
+    class Config:
+        orm_mode = True    
         
 class UserDetailsResponse(UserCreateResponse):
     pass
