@@ -21,11 +21,10 @@ def upgrade() -> None:
                     sa.Column("id", 
                               sa.Integer, 
                               nullable = False, 
-                              primary_key = True)), \
+                              primary_key = True),
                     sa.Column("title", 
                               sa.String, 
-                              nullable = False)
-
+                              nullable = False))
 
 
 def downgrade() -> None:

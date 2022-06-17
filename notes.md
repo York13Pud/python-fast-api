@@ -791,7 +791,60 @@ Once the env.py and config.ini files have been setup, you can start to use alemb
 alembic revision --message "create posts table"
 ```
 
-A new folder in the alembic folder will be created called versions.
+A new folder in the alembic folder will be created called versions. In that folder will be a file that looks similar to this:
+``` console
+785b3ca90a20_create_posts_table.py
+``` 
 
 Open the file it creates. In the file there will be two functions, one called upgrade and another called downgrade. Each of these sections are used to perform an action against the database. If you are adding to the database, use the upgrade function. To remove an existing entity in the database, use the downgrade function.
+
+To create a new table that is tracked, in the upgrade section of the file, add the code to create the table. The following example will create a new table called posts with two columns. It also has a downgrade block in there that will drop the table:
+
+``` python
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision = '785b3ca90a20'
+down_revision = None
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.create_table("posts", 
+                    sa.Column("id", 
+                              sa.Integer, 
+                              nullable = False, 
+                              primary_key = True)), \
+                    sa.Column("title", 
+                              sa.String, 
+                              nullable = False)
+
+def downgrade() -> None:
+    op.drop_table("posts")
+```
+
+Once the code has been entered as required for the database, you can then run the upgrade or downgrade. Before that, make a note of the text in the revision variable as you will need it.
+
+To run an upgrade, run the following command:
+
+``` console
+alembic upgrade 785b3ca90a20
+```
+
+This will execute the upgrade function in the revision file. The downgrade function will not be run. If you did want to run the downgrade function, the command for that is:
+
+``` console
+alembic downgrade 785b3ca90a20
+```
+
+When you run the upgrade command, a new table called alembic will appear in the database (if it doesn't already exist). This will have a single table that tracks what revision was last run successfully.
+
+To view what the most recent revision file is, you can run:
+
+``` console
+alembic head
+```
 
