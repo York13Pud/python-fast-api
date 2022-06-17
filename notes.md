@@ -757,3 +757,30 @@ class Settings(BaseSettings):
 settings = Settings()
 
 print(settings.MY_ENV_VAR)
+```
+
+### Alembic
+
+Alembic is a database migration tool. Database migrations allow for the tracking of incremental changes to the schema / models in a given database.
+
+Alembic can tie in with SQLAlchemy to pull the models into it and generate / update the tables in that database.
+
+To use alembic, you first need to install it:
+
+``` console
+pip install alembic
+```
+
+Once it is installed, it will allow you to run the alembic command. You can see what arguments you can pass into the command by looking at the help:
+
+``` console
+alembic --help
+```
+
+The first step to using alembic for database migration tracking is to initialise it. Think of it like initialising a local git repository. In the below example, change ```name-of-folder``` to whatever you want:
+
+``` console
+alembic init <name-of-folder>
+```
+
+
