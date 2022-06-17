@@ -782,5 +782,16 @@ The first step to using alembic for database migration tracking is to initialise
 ``` console
 alembic init <name-of-folder>
 ```
+Make notes for file changes to make to env.py and config.ini
 
+
+Once the env.py and config.ini files have been setup, you can start to use alembic to track your database. To begin, a revision will need to be created:
+
+``` console
+alembic revision --message "create posts table"
+```
+
+A new folder in the alembic folder will be created called versions.
+
+Open the file it creates. In the file there will be two functions, one called upgrade and another called downgrade. Each of these sections are used to perform an action against the database. If you are adding to the database, use the upgrade function. To remove an existing entity in the database, use the downgrade function.
 
