@@ -78,6 +78,7 @@ class PostResponse(Post):
 
 class AllPostResponse(Post):
     id: int
+    owner_id: int
     created_at: datetime
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
@@ -85,6 +86,7 @@ class AllPostResponse(Post):
         
 class AllPostsResponseVotes(BaseModel):
     Post: AllPostResponse
+    owner: UserCreateResponse
     votes: int
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
