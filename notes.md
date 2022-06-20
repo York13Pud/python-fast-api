@@ -1,6 +1,6 @@
 # FastAPI Notes
 
-## Basics.
+## Basics
 
 A simple app example with a single get path operation:
 
@@ -21,6 +21,7 @@ app = FastAPI()
 async def root():
     return {"greeting": "Hello World!"}
 ```
+
 NOTE: Use plural, not singular versions for the path name. For example, use /users rather than /user.
 
 FastAPI uses uvicorn to run the application as a web server. To run the app, run the below in the terminal:
@@ -38,7 +39,7 @@ Once the server is running, it will tell you what the URL it is running on and t
 
 [http://127.0.0.1:8000](http://127.0.0.1:8000 "http://127.0.0.1:8000")
 
-## Documentation.
+## Documentation
 
 As part of FastAPI, the documentation is auto-generated. You can view the API docs at the below URL's. The difference is one uses SwaggerUI to render and the other uses redoc (respectively) to render the API documentation:
 
@@ -48,8 +49,7 @@ SwaggerUI:
 Redoc:
 [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc "http://127.0.0.1:8000/redoc")
 
-
-## Post Request / Path Operation Example.
+## Post Request / Path Operation Example
 
 ``` python
 # --- A simple post request:
@@ -70,9 +70,10 @@ def get_posts(payload: dict = Body(...)):
                 "post_heading": payload["heading"]
             }
 ```
+
 A post request that uses JSON from the Body of the request to be set as a dictionary and then returned back with different key names.
 
-## Post Request Data Validation.
+## Post Request Data Validation
 
 Use the pydantc module to allow you to create a schema using a class. When called, it will also do data validation. For example:
 
@@ -105,7 +106,7 @@ def get_posts(new_post: Post):
             }
 ```
 
-## CRUD Operations.
+## CRUD Operations
 
 Create = Post
 
@@ -133,7 +134,7 @@ Delete = Well, erm, delete a record!! :-)
 @app.delete("/posts/{post_id}")
 ```
 
-## Path Operation Order.
+## Path Operation Order
 
 Put simply, the order of the paths in you files matters. If you have them set in any old order, you can encounter issues. For example:
 
@@ -147,9 +148,9 @@ With the above list of three GET request paths, if you try to call all_posts, it
 * GET HTTP 127.0.0.1/posts/all_posts
 * GET HTTP 127.0.0.1/posts/{post_id}
 
-## Error Codes.
+## Error Codes
 
-### Method One: Hard Code The Error.
+### Method One: Hard Code The Error
 
 You can specify an HTTP error code for when something occurs. In the below example, we will return a 404 (not found) if the post_id is not matched:
 
@@ -165,6 +166,7 @@ def get_one_post(post_id: int, response: Response):
     error = response.status_code = status.HTTP_404_NOT_FOUND       
     return { "error": f"Post ID {post_id} not found" }
 ```
+
 response: Response tracks the status code and we can set this to any valid HTTP code.
 
 NOTE: The above requires Response and status to be imported from the fastapi module.
@@ -180,7 +182,7 @@ In the event that the post_id is not found, the error returned will look like th
 
 In addition, the software that you are using will show 404 as the HTTP status.
 
-### Method Two: HTTPException.
+### Method Two: HTTPException
 
 Whilst method one works, there is a cleaner way that uses the HTTPException method to present the HTTP status. Using the example in method one, we can do the same as follows:
 
@@ -205,9 +207,9 @@ In the event that the post_id is not found, the error returned will look like th
 }
 ```
 
-## Enumerate Function.
+## Enumerate Function
 
-Enumerate reads the list and produces a sequence number for each dictionary / entry in the list with the first number starting at 0. 
+Enumerate reads the list and produces a sequence number for each dictionary / entry in the list with the first number starting at 0.
 
 For example, the below will take a list called my_posts, along with an id parameter / argument, enumerate it and if the id matches one of the dictionary id's, it will return the index number.
 
@@ -218,7 +220,7 @@ def find_index(id):
             return index
 ```
 
-## Python Packaging.
+## Python Packaging
 
 As part of Python, you can create packages that contain code to use in you API. A common practice is to use a folder to put the code in and also add a file called \_\_init\_\_.py. FastAPI / Python will then treat this folder as a package. An example would be to create a folder called app and then put some, or all of your code in there, along with an \_\_init\_\_.py file (which can be left empty if needed):
 
@@ -240,13 +242,14 @@ my_application
 -
 
 ```
+
 One additional thing you will need to do is to change the uvicorn path for the start file, if you moved it. For example, if we moved main.py into the app folder, we would start it by replacing main:app with app.main:app:
 
 ``` console
 uvicorn app.main:app --reload
 ```
 
-## Databases.
+## Databases
 
 By default, once PostgreSQL is installed, it creates a default database called 'postgres'.
 
@@ -261,9 +264,10 @@ Use unique constraints to enforce a column has a unique value.
 
 NULL constraints allow you to require a field to have a value and cannot be blank.
 
-### Sample SQL Queries.
+### Sample SQL Queries
 
-#### SELECT and WHERE.
+#### SELECT and WHERE
+
 Get products named Pencil or Remote:
 
 ``` sql
@@ -288,8 +292,7 @@ FROM products
 WHERE stock_level > 0;
 ```
 
-#### ORDER BY and ASC and DESC.
-
+#### ORDER BY and ASC and DESC
 
 Get products that have stock higher than 0 and sort by stock level ascending:
 
@@ -404,7 +407,7 @@ WHERE name NOT LIKE '%TV%'
 ORDER BY stock_level DESC;
 ```
 
-#### LIMIT Operator.
+#### LIMIT Operator
 
 You can limit the number of records returned by using the LIMIT operator. For example:
 
@@ -418,7 +421,7 @@ ORDER BY stock_level DESC
 LIMIT 5;
 ```
 
-#### OFFSET Operator.
+#### OFFSET Operator
 
 OFFSET can be used to ignore the first x number of results that have been found and show x results from what you offset by. For example:
 
@@ -433,7 +436,7 @@ LIMIT 5
 OFFSET 2;
 ```
 
-### Sample SQL Data Insertions.
+### Sample SQL Data Insertions
 
 To add data to a table, you use the INSERT operator. For example:
 
@@ -482,29 +485,33 @@ VALUES
 RETURNING id, name, price, stock_level;
 ```
 
-### Delete Records.
+### Delete Records
 
 To delete a record from the products table:
+
 ``` sql
 DELETE FROM products WHERE id = 12;
 ```
 
 To delete a record from the products table and see what it was before it was deleted, you can use the returning operator:
+
 ``` sql
 DELETE FROM products WHERE id = 12 RETURNING id, name;
 ```
 
 To delete multiple records from the products table using the id column:
+
 ``` sql
 DELETE FROM products WHERE id IN (1,2);
 ```
 
 To delete multiple records based on a criteria rather than a fixed record, you can do the following (delete all products with price > 100):
+
 ``` sql
 DELETE FROM products WHERE price > 100 RETURNING id, name;
 ```
 
-### Updating Records.
+### Updating Records
 
 To update a record, you can do this using the UPDATE operator and SET operator. For example:
 
@@ -518,11 +525,11 @@ To update multiple records by a criteria, it's simple to do. For example:
 UPDATE products SET on_sale=true WHERE id > 6  RETURNING id, name, price, on_sale;
 ```
 
-### Composite Keys.
+### Composite Keys
 
 This is a primary key that spans multiple columns. For example, post_id and user_id can compose a composite key for a likes table to stop a user from liking a post more than once.
 
-### Psycopg2.
+### Psycopg2
 
 Psycopg2 (or Psycopg3) is a driver to allow Python to interact with a PostgreSQL database by using standard SQL commands, just like you normally would with say pgAdmin or the pgsql CLI.
 
@@ -547,6 +554,7 @@ print("Connected to DB")
 ```
 
 Once the connection is made, you can start to pass queries to it. For example, get all the records in a table:
+
 ``` python
 # --- Get all posts:
 @app.get("/posts")
@@ -587,13 +595,13 @@ def delete_post(id: int):
 
 Note: HTTP 204 will return no data back to the API requester. It will only return back a 204.
 
-### Object Relational Mapper (ORM).
+### Object Relational Mapper (ORM)
 
 An ORM is a layer of abstraction that sits between Python and the database. In effect, it will take code that is Python-based, convert it into SQL and then run those queries against the database and return whatever is needed in a Python friendly (dictionaries / lists) format. As a result, you no longer need to write out any SQL queries!
 
 For Python, we would typically use SQLAlchemy as our ORM.
 
-#### Install SQLAlchemy.
+#### Install SQLAlchemy
 
 ``` console
 pip install sqlalchemy
@@ -605,9 +613,10 @@ You will also need a driver for Python to connect to PostgreSQL. We will use psy
 pip install psycopg2-binary
 ```
 
-#### Setup Database Connection and Tables.
+#### Setup Database Connection and Tables
 
 Once installed, you would typically create two files:
+
 * database.py - This file contains the code that is used to connect to the database server and the required database(s).
 * models.py - This file contains all of the table schemas for the database you are using.
 
@@ -619,7 +628,6 @@ models.Base.metadata.create_all(bind = engine)
 ```
 
 Note: SQLAlchemy will not update tables in the models if the table already exists. If schema changes need to be made, this is called a migration and is handled by another library called Alembic.
-
 
 ### Route File Separation and Path Prefix
 
@@ -668,7 +676,7 @@ app.include_router(post.router)
 app.include_router(user.router)
 ```
 
-### API Documentation Grouping.
+### API Documentation Grouping
 
 As part of using route files, you can also group you API's up so that the documentation produced by SwaggerUI will group up the API actions by tag names. For example, all of the routes / path operations in the file called post.py should be grouped up using the name Posts:
 
@@ -684,7 +692,7 @@ router = APIRouter(
 
 You can use multiple tags if you wish as it is a list that is passed.
 
-### JWT: JSON Web Token Authentication.
+### JWT: JSON Web Token Authentication
 
 JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for representing claims securely between two parties.
 
@@ -695,8 +703,7 @@ JSON Web Tokens (JWT) are an open, industry standard (RFC 7519) method for repre
 * The payload part of the token can be read by other actors. Don't include any confidential info in there.
 * The token is not encrypted.
 
-
-### Environment Variables.
+### Environment Variables
 
 Use these instead of hard coding things like passwords into the code.
 
@@ -713,7 +720,7 @@ import os
 print(os.getenv("MY_ENV_VAR"))
 ```
 
-You can use pydantic and a class to construct an object with all of the environment variables in so that you can access them but also have pydantic verify they exist. If they don't, it will error. 
+You can use pydantic and a class to construct an object with all of the environment variables in so that you can access them but also have pydantic verify they exist. If they don't, it will error.
 
 Pydantic BaseSettings is used to read environment variables. The name of the environment variable be be in uppercase or lowercase. Pydantic will convert it to uppercase to match that of the environment variable as they are in uppercase at the O/S level.
 
@@ -732,7 +739,7 @@ print(settings.MY_ENV_VAR)
 # --- prints hello or (if my_env_var is not defined) localhost.
 ```
 
-Rather than setting the environment variables (for dev at least, don't do this for prod), you can use and environments variable file. This file is a simple one that contains the name and value of each environment variable. 
+Rather than setting the environment variables (for dev at least, don't do this for prod), you can use and environments variable file. This file is a simple one that contains the name and value of each environment variable.
 
 The file name is typically .env. For example:
 
@@ -782,8 +789,8 @@ The first step to using alembic for database migration tracking is to initialise
 ``` console
 alembic init <name-of-folder>
 ```
-Make notes for file changes to make to env.py and config.ini
 
+Make notes for file changes to make to env.py and config.ini
 
 Once the env.py and config.ini files have been setup, you can start to use alembic to track your database. To begin, a revision will need to be created:
 
@@ -792,9 +799,10 @@ alembic revision --message "create posts table"
 ```
 
 A new folder in the alembic folder will be created called versions. In that folder will be a file that looks similar to this:
+
 ``` console
 785b3ca90a20_create_posts_table.py
-``` 
+```
 
 Open the file it creates. In the file there will be two functions, one called upgrade and another called downgrade. Each of these sections are used to perform an action against the database. If you are adding to the database, use the upgrade function. To remove an existing entity in the database, use the downgrade function.
 
@@ -848,3 +856,54 @@ To view what the most recent revision file is, you can run:
 alembic head
 ```
 
+### CORS
+
+CORS, or Cross Origin Resource Sharing allows you to make requests from a web browser on one domain to a server on a different domain.
+
+By default, the FastAPI dev server will only permit access to requests sent from the local system.
+
+To enable FastAPI to use CORS, you need to perform the following:
+
+``` python
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+
+app = FastAPI()
+
+
+origins = [
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+To test CORS, open up a browser and go to one of the domains in the allowed list. From there, go to the developer tools (F12 for most), click console and enter:
+
+``` javascript
+fetch('http://localhost:8000/').then(res=>res.json()).then(console.log)
+```
+
+If CORS is setup correctly, the response will be whatever was set at the root level route that was set. If not, you will likely get a message indicating a CORS policy has blocked the request. An example is shown below:
+
+``` console
+Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://play.google.com/log?format=json&hasfast=true&authuser=0. (Reason: CORS request did not succeed). Status code: (null).
+```
+
+The likely hood is that the domain you are connecting from is setup incorrectly in the allowed list or the request was made from the wrong domain. Check the URL that is showing as it might have been redirected.
