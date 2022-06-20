@@ -907,3 +907,7 @@ Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remot
 ```
 
 The likely hood is that the domain you are connecting from is setup incorrectly in the allowed list or the request was made from the wrong domain. Check the URL that is showing as it might have been redirected.
+
+### Gunicorn
+
+It is a process manager that will be used to run the FastAPI app.
