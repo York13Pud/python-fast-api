@@ -911,3 +911,82 @@ The likely hood is that the domain you are connecting from is setup incorrectly 
 ### Gunicorn
 
 It is a process manager that will be used to run the FastAPI app.
+
+Install the package with pip, along with some dependencies:
+
+``` console
+pip install uvloop uvtools httptools gunicorn
+```
+
+Once installed, you can run the app:
+
+``` console
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind <ip-address:port>
+```
+
+The issue with the above is that it is a runtime command, meaning it will be active whilst you are logged in and running it. Instead, you can create a systemd service to start the process at system startup and manage it via systemd.
+
+An example systemd service is shown below. The filename will be fastapi.service:
+
+``` bash
+[Unit]
+Description=demo fastapi application
+After=network.target
+
+[Service]
+User=neil
+Group=neil
+WorkingDirectory=/home/neil/app/source/
+Environment="PATH=/home/neil/app/venv/bin"
+EnvironmentFile=/home/neil/.env
+ExecStart=/home/neil/app/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:8000
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Once the file is created, the service can be started:
+
+``` console
+sudo systemctl start fastapi.service
+```
+
+The service will then start. To have the service start at whenever the system is restarted, run the following command:
+
+``` console
+sudo systemctl enable fastapi.service
+```
+
+### NGINX
+
+Once Gunicorn is configured, the next step is to setup NGINX to act as a proxy server that will perform SSL termination as well.
+
+First, install it on Ubuntu and then enable it to startup when the system is rebooted:
+
+``` console
+sudo apt install nginx && sudo systemctl enable nginx
+```
+
+Next, edit the /etc/nginx//sites-available/defaul file and replace the location section with the below:
+
+``` console
+location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_redirect off;
+}
+```
+
+Restart NGINX:
+
+``` console
+sudo systemctl restart nginx
+```
+
+Open a browser and it should show the default route from the FastAPI application.
