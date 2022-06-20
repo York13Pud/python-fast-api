@@ -85,8 +85,7 @@ class AllPostResponse(Post):
         orm_mode = True
         
 class AllPostsResponseVotes(BaseModel):
-    Post: AllPostResponse
-    owner: UserCreateResponse
+    Post: PostResponse
     votes: int
     # --- This class will allow the pydantic library to return back a dictionary format:
     class Config:
