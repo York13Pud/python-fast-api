@@ -990,3 +990,47 @@ sudo systemctl restart nginx
 ```
 
 Open a browser and it should show the default route from the FastAPI application.
+
+### Testing
+
+Testing will be done with pytest. First, install it:
+
+``` console
+pip install pytest
+```
+
+Place all of the tests in a folder named tests (at the root) and name the files either test_*.py or *_test.py with * being whatever you want to call it. PyTest will look for files with these name formats in the tests folder by default.
+
+An example of  simple test is shown below. The test will perform a basic add operation:
+
+``` python
+from app.calculations import add_test
+
+def test_add():
+    print("Testing add function")
+    total_sum = add_test(5, 3)
+    # True is ok, False will error
+    assert total_sum == 8
+    
+test_add()
+```
+
+The assert method will perform a true / false check for a desired outcome. In the above example, the expected result of 5+3 is 8, which will result in True. This will result in the test passing.
+
+PyTest is a command line tool. You use it by running ```pytest``` at the command line. The result of this should be true and look like the following output:
+
+``` console
+============================== test session starts ==============================
+
+platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0
+rootdir: /Users/neil/Documents/training/programming/python/python-fast-api
+plugins: anyio-3.6.1
+collected 1 item
+
+tests/test_basic.py .                                                      [100%]
+
+==============================  1 passed in 0.02s  ==============================
+```
+
+Collected 1 item indicates the number of tests found.
+The . after tests/test_basic.py indicates the number of tests run in that file. Green is ok and red is a failed test.
