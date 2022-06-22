@@ -999,9 +999,11 @@ Testing will be done with pytest. First, install it:
 pip install pytest
 ```
 
-Place all of the tests in a folder named tests (at the root) and name the files either test_*.py or *_test.py with * being whatever you want to call it. PyTest will look for files with these name formats in the tests folder by default.
+Place all of the tests in a folder named tests (at the root) and name the files either test_*.py or *_test.py with * being whatever you want to call it. PyTest will look for files with these name formats in the tests folder by default. You can pass the filename to pytest manually if you don't want to follow that naming convention.
 
-An example of  simple test is shown below. The test will perform a basic add operation:
+Also, with auto-test discovery, the name of the functions in the test files nee to start with test_.
+
+An example of a simple test is shown below. The test will perform a basic add operation:
 
 ``` python
 from app.calculations import add_test
@@ -1032,5 +1034,120 @@ tests/test_basic.py .                                                      [100%
 ==============================  1 passed in 0.02s  ==============================
 ```
 
-Collected 1 item indicates the number of tests found.
-The . after tests/test_basic.py indicates the number of tests run in that file. Green is ok and red is a failed test.
+To explain a little about the above:
+
+* Collected 1 item indicates the number of tests found.
+* The . after tests/test_basic.py indicates the number of tests run in that file. If there were two tests, it would show .. instead. Green is ok and red is a failed test.
+
+It is recommended to use ```pytest -v``` instead as the verbose detail is more useful. A sample output is shown below:
+
+``` console
+============================== test session starts ==============================
+
+platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0 -- /Users/neil
+/Documents/training/programming/python/python-fast-api/venv/bin/python3
+
+cachedir: .pytest_cache
+rootdir: /Users/neil/Documents/training/programming/python/python-fast-api
+plugins: anyio-3.6.1
+
+collected 2 items         
+
+tests/test_basic.py::test_add PASSED                                     [ 50%]
+tests/test_basic.py::test_sub PASSED                                     [100%]
+
+============================== 2 passed in 0.03s ==============================
+```
+
+The main difference is that rather than showing a . for each test, it will show a list of each test that was run. This is much more useful.
+
+A point of note; print statements, by default are not shown on the test output. To allow this, add the -s switch to the pytest command when you run it.
+
+The examples shown so far have been basic and limited to only one test. But what do we do if we need to run multiple tests using the same function?
+
+What can be done is to use a wrapper function called pytest.mark.parametrize to pass a list of tuples, with each tuple having the test values to use in, including any expected results. For example, the below will perform three additions using a function:
+
+``` python
+import pytest
+
+@pytest.mark.parametrize("num_1, num_2, result", [(3,2,5),
+                                                  (5,2,7),
+                                                  (8,7,15)
+                                                 ])
+def test_add(num_1, num_2, result):
+    total_sum = num_1 + num_2
+    # True is ok (green), False will error (red)
+    assert total_sum == result
+```
+
+When you run it with ```pytest -v```, the below is the expected output:
+
+``` console
+============================== test session starts ==============================
+platform darwin -- Python 3.10.4, pytest-7.1.2, pluggy-1.0.0 -- /Users/neil/
+Documents/training/programming/python/python-fast-api/venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/neil/Documents/training/programming/python/python-fast-api
+plugins: anyio-3.6.1
+collected 3 items
+
+tests/test_basic.py::test_add[3-2-5] PASSED                                [ 33%]
+tests/test_basic.py::test_add[5-2-7] PASSED                                [ 66%]
+tests/test_basic.py::test_add[8-7-15] PASSED                               [100%]
+
+==============================  3 passed in 0.03s  ==============================
+```
+
+When you work with tests that make use of a class, rather than initialising it each time in a function, you can use a fixture initialise it and then pass that to the functions. This will save time writing out the code multiple time and you may need to initialise a number of things prior.
+
+For example, a class (not shown) named BankAccount is used by multiple functions:
+
+``` python
+import pytest
+
+from bankaccount import BankAccount
+
+@pytest.fixture
+def zero_bank_balance():
+    # --- The default value for balance is 0 so no need to pass it:
+    return BankAccount()
+
+
+@pytest.fixture
+def bank_balance():
+    return BankAccount(blance=50)
+
+
+def test_bank_default_balance(zero_bank_balance):
+    assert zero_bank_balance.balance == 0
+
+
+def test_bank_set_initial_balance(bank_balance):
+    assert bank_balance.balance == 50
+
+
+def test_bank_withdraw(bank_balance):
+    bank_balance.withdraw(30)
+    assert bank_balance.balance == 20
+```
+
+You can also use parameterisation along with fixtures. For example:
+
+``` python
+
+@pytest.mark.parametrize("deposit, withdraw, result", [(200,100,100),
+                                                       (300,150,150)
+                                                      ])
+def test_bank_transactions(zero_bank_balance, deposit, withdraw, result):
+    bank_balance.deposit(deposit)
+    bank_balance.withdraw(withdraw)
+    assert zero_bank_balance.deposit == result
+```
+
+In the event that you need to perform a test that will fail and raise an error, which is the expected outcome, you can use pytest.raises. For example:
+
+``` python
+def test_insufficient_funds(bank_balance):
+    with pytest.raises(Exception):
+        bank_account.withdraw(200)
+```
