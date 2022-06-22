@@ -15,4 +15,3 @@ def test_root():
     print(res.json().get("greeting"))
     # --- Test to see if the response matches what we expect:
     assert res.json().get("greeting") == "This is not the endpoint you are looking for!"
-    
