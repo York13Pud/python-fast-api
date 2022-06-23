@@ -1151,3 +1151,5 @@ def test_insufficient_funds(bank_balance):
     with pytest.raises(Exception):
         bank_account.withdraw(200)
 ```
+
+To stop pytest running additional tests when a failure of one occurs, you can run pytest with -x.
