@@ -1,6 +1,7 @@
 # --- Import the required modules:
 from fastapi.testclient import TestClient
 from app.main import app
+from app.schemas import UserCreateResponse
 
 
 # --- Create the client to interact with the app:
@@ -8,11 +9,15 @@ client = TestClient(app)
 
 
 # --- Define a function that will test the root url of the app:
-def test_root():
-    # --- Make a call to the root URL:
-    res = client.get("/")
-    # --- Print out the contents of the "greeting" key:
-    print(res.json().get("greeting"))
-    # --- Test to see if the response matches what we expect:
-    assert res.json().get("greeting") == "This is not the endpoint you are looking for!"
+def test_user_create():
+    # --- Make a post request to the user URL to create a user:
+    res = client.post("/user/", 
+                      json={"email": "sam@sam.sam", 
+                            "password": "password123454648945456sddsfdffhgh4"
+                            })
+    
+    new_user = UserCreateResponse(**res.json())
+    
+    assert new_user.email == "sam@sam.sam"
+    assert res.status_code == 201
     
