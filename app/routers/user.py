@@ -29,21 +29,17 @@ def new_user(user: UserCreate,
 
     # --- Define a variable to create a user object / model:
     new_user = models.User( **user.dict() )
-    
-    # try:
-        # --- Add the post to the table. You must use commit to write the post tot the table:
+
+    # --- Add the post to the table. You must use commit to write the post tot the table:
     db.add(new_user)
     db.commit()
     
     # --- Use refresh to update new_post with the details of the newly written post:
     db.refresh(new_user)
 
-    # except Exception as error:
-    #     raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST,
-    #                         detail = f"The email address {user.email} already exists. Please try again with a different email address.")  
-    
     # --- Return the value of the post:
     return new_user
+
 
 @router.get("/{id}", 
             response_model=UserDetailsResponse)
