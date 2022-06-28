@@ -2,6 +2,7 @@
 from app.schemas import UserCreateResponse, Token
 from app.config import settings
 from jose import jwt
+from pytest import mark
 
 
 email = "sam@sam.sam"
@@ -39,12 +40,21 @@ def test_user_login(fastapi_client, test_user):
     assert res.status_code == 200
     
 
+
 # --- Define a function that will test a failed user login URL:
-def test_login_failure(test_user, fastapi_client):
+@mark.parametrize("email, password, status_code", [
+    ("wrongemail@gmail.com", "password123", 403),
+    ("wrongemail@gmail.com", "wrongpassword", 403),
+    ("wrongemail@gmail.com", "wrongpassword", 403),
+    ("wrongemail@gmail.com", None, 422),
+    (None, "password123", 422)
+])
+
+def test_login_failure(test_user, fastapi_client, email, password, status_code):
     res = fastapi_client.post("/login", 
-                    data={"username": test_user["email"], 
-                        "password": "fjhdjhlfhusdhfhsdh8384uhh3ghuef87w9ydsuhd8y"
+                    data={"username": email, 
+                        "password": password
                         })
     
-    assert res.status_code == 403
-    assert res.json().get("detail") == "Invalid Credentials. Please Try Again."
+    assert res.status_code == status_code
+    # assert res.json().get("detail") == "Invalid Credentials. Please Try Again."
