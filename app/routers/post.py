@@ -100,7 +100,7 @@ def new_post(post: PostCreate,
              current_user: int = Depends(get_current_user)
              ):
     
-    print(f"Current User ID: {current_user.id}")
+    # print(f"Current User ID: {current_user.id}")
     
     new_post = models.Post(owner_id = current_user.id, **post.dict() )
     
@@ -129,9 +129,9 @@ def delete_post(id: int,
     
     post = db.query(models.Post).filter(models.Post.id == id).first()
     
-    print(post.id)
-    print(current_user.id)
-    print(post.owner_id)
+    # print(post.id)
+    # print(current_user.id)
+    # print(post.owner_id)
     
     if post == None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
@@ -143,7 +143,7 @@ def delete_post(id: int,
     db.delete(post)
     db.commit()
                 
-    return Response(status_code = status.HTTP_200_OK)
+    return Response(status_code = status.HTTP_204_NO_CONTENT)
 
 
 # --- Update a post:   

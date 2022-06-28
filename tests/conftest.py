@@ -93,7 +93,7 @@ def token(test_user):
 def authorised_client(fastapi_client, token):
     fastapi_client.headers = {
         **fastapi_client.headers,
-        "authorisation": f"Bearer {token}"
+        "authorization": f"Bearer {token}"
     }
     return fastapi_client
 
