@@ -53,7 +53,7 @@ def get_all_posts(db: Session = Depends(get_db),
             response_model = List[PostResponse]
             )
 
-def get_all_posts(db: Session = Depends(get_db), 
+def get_my_posts(db: Session = Depends(get_db), 
                   current_user: int = Depends(get_current_user)
                   ):
     # --- Get all the posts from the table.

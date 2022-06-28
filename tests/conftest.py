@@ -3,9 +3,11 @@
 
 
 # --- Import the required modules:
+from app.auth.oauth2 import create_access_token
 from app.config import settings
 from app.database import get_db, Base
 from app.main import app
+from app.models import models
 from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy import create_engine
@@ -80,3 +82,57 @@ def test_user(fastapi_client):
     new_user["password"] = user_data["password"]
     
     return new_user
+
+
+@fixture
+def token(test_user):
+    return create_access_token({"user_id": test_user["id"]})
+
+
+@fixture
+def authorised_client(fastapi_client, token):
+    fastapi_client.headers = {
+        **fastapi_client.headers,
+        "authorisation": f"Bearer {token}"
+    }
+    return fastapi_client
+
+
+@fixture
+def test_posts(test_user, session):
+    # --- Define a variable with a list of dictionaries that 
+    posts_data = [{"title": "One",
+                   "content": "Content for One.",
+                   "owner_id": test_user["id"]
+                   },
+                  {"title": "Two",
+                   "content": "Content for Two.",
+                   "owner_id": test_user["id"]
+                   },
+                  {"title": "Three",
+                   "content": "Content for Three.",
+                   "owner_id": test_user["id"]
+                   }
+                  ]
+    
+    # --- This function will covert the info in each post in post_data 
+    # --- into a Post model that can be used to insert into the posts table:
+    def create_post_model(post):
+        return models.Post(**post)
+    
+    # --- Use map (iterate over a list without a for loop) to transform 
+    # --- the posts_data list into a map of post model compatible data:
+    posts_map = map(create_post_model, posts_data)
+    
+    # --- Convert the map to a list:
+    posts = list(posts_map)
+    
+    # print(posts)
+    # --- Commit the data to the posts table:
+    session.add_all(posts)
+    session.commit()
+    
+    # --- Get all of the posts in the posts table:
+    posts_query = session.query(models.Post).all()
+    
+    return posts_query
