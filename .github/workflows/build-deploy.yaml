@@ -1,0 +1,16 @@
+name: Build and Deploy Python Code
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+jobs:
+  job1:
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+      - name: Say Hello world
+        run: echo "hello world"
