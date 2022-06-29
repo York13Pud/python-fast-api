@@ -52,4 +52,4 @@ jobs:
       - name: Install pytest
         run: pip install pytest
       - name: Run Pytest
-        run: pytest -v -s -x
+        run: pytest -v -s
