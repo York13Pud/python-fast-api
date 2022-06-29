@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 # --- Create a constant that will be used to point to and pass the user details to our database:
-SQLALCHEMY_DATABASE_URL = f"{settings.database_type}://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
+SQLALCHEMY_DATABASE_URL = f"{settings.database_type}://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 print(SQLALCHEMY_DATABASE_URL)
 
 # --- Create an engine to connect to the database:
